@@ -4,7 +4,7 @@ import NProgress from "nprogress"; // progress bar
 import "nprogress/nprogress.css"; // progress bar style
 NProgress.configure({ showSpinner: false });
 // 导入 layout
-import layout from '@/views/layout/index.vue'
+import layout from '@/App.vue'
 let router = createRouter({
   // 设置路由模式
   history: createWebHistory(),
@@ -13,8 +13,8 @@ let router = createRouter({
     {
       path: '/', component: layout,
       children: [
-        { path: '', component: () => import('@/views/home/index.vue') },
-        { path: '/test', component: () => import('@/views/test/index.vue') },
+        { path: '', component: () => import('@/views/home/Login.vue') },
+        { path: '/table', component: () => import('@/views/home/tabulation.vue') },
       ]
     },
   ],

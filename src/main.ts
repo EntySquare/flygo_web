@@ -10,10 +10,23 @@ import router from './router/index'
 import plugin from "./components/index";
 // 导入 pinia
 import { createPinia } from 'pinia'
+
+// 导入 element-plus
+import ElementPlus from "element-plus";
+import 'element-plus/dist/index.css'
+// 导入 element-plus 图标
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+
+
 let pinia = createPinia()
 
-createApp(App).use(router)
+createApp(App)
+    .use(ElementPlus)
     .use(router)
     .use(pinia)
     .use(plugin)
     .mount('#app')
+// 挂载 element-plus 图标
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+    createApp(App).component(key, component)
+}

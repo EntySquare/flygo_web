@@ -1,4 +1,5 @@
 // 管理网络请求
+import useHomeStore from '@/store/modules/home'
 import axios from 'axios'
 // 创建 axios 副本对象
 let request = axios.create({
@@ -8,6 +9,8 @@ let request = axios.create({
 // 设置请求拦截器
 request.interceptors.request.use(
     config => {
+        const token = useHomeStore().Token
+        config.headers.token = token
         return config
     },
     err => {
