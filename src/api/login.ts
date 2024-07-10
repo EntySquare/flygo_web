@@ -15,7 +15,9 @@ export const checkUserInfo = (data: any) => {
     return request({
         url: '/checkUserInfo',
         method: 'post',
-        data,
+        data: {
+            Flag: data
+        },
 
     })
 }
@@ -47,11 +49,13 @@ export const viewUserInfoAll = () => {
 
 
 // 查询用户信息接口 要筛选就传对应字段    id 用户名 手机号 身份证 只能筛选这四个
-export const viewUserInfo = () => {
+export const viewUserInfo = (data: any) => {
     return request({
         url: '/viewUserInfo',
         method: 'post',
-
+        data: {
+            id: data
+        }
     })
 }
 

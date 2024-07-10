@@ -11,13 +11,13 @@
     >
       <el-form-item label="用户名" prop="manager_name ">
         <el-input
-          v-model="loginForm.manager_name"
+          v-model.trim="loginForm.manager_name"
           placeholder="请输入用户名"
         ></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="password">
         <el-input
-          v-model="loginForm.password"
+          v-model.trim="loginForm.password"
           type="password"
           placeholder="请输入密码"
         ></el-input>
@@ -74,8 +74,14 @@ const handleLogin = () => {
 
       if (res.status === 200) {
         ElMessage.success('登录成功')
+
+        const storedToken = localStorage.getItem('token')
+        console.log('storedToken', storedToken)
         useHomeStore().setToken(res.data.json.token)
-        router.push('/table')
+        if (storedToken == null) {
+          localStorage.setItem('token', res.data.json.token)
+        }
+        router.push('/')
       } else {
         ElMessage.error(res.statusText)
       }

@@ -13,12 +13,12 @@ let router = createRouter({
     {
       path: '/', component: layout,
       children: [
-        { path: '', component: () => import('@/views/home/Login.vue') },
-        { path: '/table', component: () => import('@/views/home/tabulation.vue') },
+        { path: '/login', component: () => import('@/views/home/Login.vue') },
+        { path: '', component: () => import('@/views/home/tabulation.vue') },
+        { path: '/details', component: () => import('@/views/home/details.vue') },
       ]
     },
   ],
-
 })
 
 // 在路由切换前显示进度条
