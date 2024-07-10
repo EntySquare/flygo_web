@@ -54,13 +54,13 @@
           label="hash"
         />
         <el-table-column
-          width="70%"
+          width="68%"
           v-if="width < 768"
           prop="name"
           label="姓名"
         />
         <el-table-column
-          width="70%"
+          width="68%"
           v-if="width < 768"
           prop="id_card"
           label="身份证号码"
@@ -77,7 +77,7 @@
               class="the_details"
               type="primary"
               plain
-              @click="handleClick(row)"
+              @click="handleClick(row.hash)"
               >详情</el-button
             >
           </template></el-table-column
@@ -125,9 +125,9 @@
         <el-table-column v-if="width > 768" prop="flag" label="是否KYC">
           <template #default="{ row }">
             <el-checkbox
-              v-model="row.flag"
+              v-model="row.flagBool"
               size="large"
-              @change="handleChange(Number(row.flag))"
+              @change="handleChange(Number(row.flagBool), row.hash)"
             />
           </template>
         </el-table-column>
@@ -136,51 +136,106 @@
           prop="ViewTheContract"
           label="查看合同"
         >
-          <el-button type="primary" size="small" plain>查看</el-button
-          ><el-button type="primary" size="small" plain>下载</el-button>
+          <template #default="{ row }">
+            <a :href="row.upload_info_list[3].url" target="_blank">
+              <el-button type="primary" size="small" plain> 查看 </el-button>
+            </a>
+          </template>
         </el-table-column>
-        <el-table-column v-if="width > 768" prop="ViewVideo" label="查看视频"
-          ><el-button type="primary" size="small" plain>查看</el-button
-          ><el-button type="primary" size="small" plain
-            >下载</el-button
-          ></el-table-column
+        <el-table-column v-if="width > 768" prop="ViewVideo" label="查看视频">
+          <template #default="{ row }">
+            <a :href="row.upload_info_list[2].url" target="_blank">
+              <el-button type="primary" size="small" plain> 查看 </el-button>
+            </a>
+          </template></el-table-column
         >
         <el-table-column
           v-if="width > 768"
           prop="ViewIDCardFront"
           label="查看身份证正面"
-          ><el-button type="primary" size="small" plain>查看</el-button
-          ><el-button type="primary" size="small" plain
-            >下载</el-button
-          ></el-table-column
+          ><template #default="{ row }">
+            <el-button
+              type="primary"
+              size="small"
+              @click="viewClick(row.upload_info_list[0].url, 'idcardF')"
+              plain
+            >
+              查看
+            </el-button>
+            <!-- <a :href="row.upload_info_list[0].url" target="_blank">
+              <el-button type="primary" size="small" plain> 下载 </el-button>
+            </a> -->
+          </template></el-table-column
         >
         <el-table-column
           v-if="width > 768"
           prop="ViewIDCardBack"
           label="查看身份证背面"
-          ><el-button type="primary" size="small" plain>查看</el-button
-          ><el-button type="primary" size="small" plain
-            >下载</el-button
-          ></el-table-column
+          ><template #default="{ row }">
+            <el-button
+              type="primary"
+              size="small"
+              @click="viewClick(row.upload_info_list[1].url, 'idcardB')"
+              plain
+            >
+              查看
+            </el-button>
+            <!-- <a :href="row.upload_info_list[1].url" target="_blank">
+              <el-button type="primary" size="small" plain> 下载 </el-button>
+            </a> -->
+          </template></el-table-column
         >
       </el-table>
     </div>
+
+    <!-- 图片预览对话框 -->
+    <el-dialog
+      v-model="dialogVisible"
+      :title="dialogTitle"
+      :close-on-click-modal="true"
+      :close-on-press-escape="true"
+      :show-close="true"
+      width="40%"
+    >
+      <video v-if="videoType" src="dialogUrl"></video>
+      <img
+        v-else
+        :src="dialogUrl"
+        alt="查看身份证正面"
+        style="width: 100%; height: auto"
+      />
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { Menu as IconMenu, Message, Setting } from '@element-plus/icons-vue'
-import useHomeStore from '@/store/modules/home'
-import { checkUserInfo, viewUserInfoAll } from '@/api/login'
-import { ElMessageBox } from 'element-plus'
+import { checkUserInfo, viewUserInfo } from '@/api/login'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import router from '@/router'
+import { useRoute } from 'vue-router'
 
 // 使用 window.innerWidth 和 window.innerHeight
 const width = window.innerWidth
 const height = window.innerHeight
+const route = useRoute()
 
 console.log(`窗口宽度: ${width}px, 窗口高度: ${height}px`)
+
+const dialogVisible = ref(false)
+const dialogUrl = ref('')
+const dialogTitle = ref('图片预览')
+const videoType = ref(false)
+
+const viewClick = (link: string, type: 'idcardF' | 'idcardB') => {
+  dialogUrl.value = link
+  if (type === 'idcardF') {
+    dialogTitle.value = '身份证正面预览'
+  } else if (type === 'idcardB') {
+    dialogTitle.value = '身份证背面预览'
+  }
+  dialogVisible.value = true
+}
 
 // 或者使用 document.documentElement.clientWidth 和 document.documentElement.clientHeight
 const clientWidth = document.documentElement.clientWidth
@@ -193,7 +248,12 @@ const formIdCard = ref('')
 const formPhone = ref('')
 
 const handleClick = (id: string) => {
-  router.push('/details')
+  router.push({
+    path: '/details',
+    query: {
+      hash: id
+    }
+  })
 }
 const flag = ref('0')
 
@@ -210,6 +270,7 @@ interface RuleFormRequest {
   wallet_address: string // 接收方钱包地址
   political: number // 是否有五级等以内为重要政治性职务人士 (1-是, 2-否)
   flag: string // 是否KYC
+  flagBool: boolean
   // ViewTheContract: string // 查看合同
   // ViewVideo: string // 查看视频
   // ViewIDCardFront: string // 查看身份证正面
@@ -223,49 +284,21 @@ if (!storedToken) {
 const tableData = ref<RuleFormRequest[]>([])
 const getUserInfo = async () => {
   if (storedToken) {
-    const res = await viewUserInfoAll()
+    const res = await viewUserInfo({})
     if (res.data.code === 0) {
       tableData.value = res.data.json.user_info_list
+      for (const item of tableData.value) {
+        item.flagBool = item.flag === '1'
+      }
     }
     console.log('res', res.data.json.user_info_list)
   }
 }
-const getKycInfo = async (flag: Number) => {
-  const res = await checkUserInfo(String(flag))
-  console.log('getKycInfo,res', res)
+const getKycInfo = async (flag: Number, hash: string) => {
+  return await checkUserInfo({ hash: hash, flag: flag.toString() })
 }
 
-// const handleChange = async (newValue: number) => {
-//   if (newValue) {
-//     try {
-//       await ElMessageBox.confirm('确定要勾选吗?', '提示', {
-//         confirmButtonText: '确定',
-//         cancelButtonText: '取消',
-//         type: 'info'
-//       })
-//       getKycInfo(newValue)
-//     } catch (error) {
-//       // 如果用户取消操作，则取消勾选
-//       throw new Error('用户取消了操作')
-//     }
-//     sendRequest('checked')
-//   } else {
-//     try {
-//       await ElMessageBox.confirm('确定要取消勾选吗?', '提示', {
-//         confirmButtonText: '确定',
-//         cancelButtonText: '取消',
-//         type: 'warning'
-//       })
-
-//       getKycInfo(newValue)
-//     } catch (error) {
-//       throw new Error('用户取消了操作')
-//     }
-//     sendRequest('unchecked')
-//   }
-// }
-
-const handleChange = async (newValue: Number) => {
+const handleChange = async (newValue: Number, hash: string) => {
   console.log('newValue', newValue)
 
   try {
@@ -279,17 +312,23 @@ const handleChange = async (newValue: Number) => {
       }
     )
     if (confirmed) {
-      await getKycInfo(newValue)
-      sendRequest(newValue ? 'checked' : 'unchecked')
+      const res = await getKycInfo(newValue, hash)
+      if (res.data.code !== 0) {
+        throw new Error('操作失败')
+      } else {
+        // 刷新页面
+        getUserInfo()
+      }
     } else {
+      for (const item of tableData.value) {
+        item.flagBool = item.flag === '1'
+      }
       throw new Error('用户取消了操作')
     }
   } catch (error) {
-    tableData.value.forEach(item => {
-      if (item.flag !== String(newValue)) {
-        item.flag = String(newValue)
-      }
-    })
+    for (const item of tableData.value) {
+      item.flagBool = item.flag === '1'
+    }
     throw new Error('用户取消了操作')
   }
 }
@@ -324,25 +363,73 @@ const UseOfExpensesOptionsfun = (form: string) => {
   }
 }
 
-const handleSubmit = (type: string) => {
-  console.log('type', type)
-  if (type === 'hash') {
+const handleSubmit = async (type: string) => {
+  let queryParam: Record<string, any> = {}
+
+  // 根据 type 设定查询参数
+  switch (type) {
+    case 'hash':
+      queryParam = { hash: formHash.value }
+      break
+    case 'name':
+      queryParam = { name: formName.value }
+      break
+    case 'id_card':
+      queryParam = { id_card: formIdCard.value }
+      break
+    case 'phone':
+      queryParam = { phone: formPhone.value }
+      break
+    default:
+      ElMessage.error('无效的查询类型')
+      return
   }
-  if (type === 'name') {
-  }
-  if (type === 'id_card') {
-  }
-  if (type === 'phone') {
+
+  try {
+    // 发起查询请求
+    const res = await viewUserInfo(queryParam)
+
+    if (res.data.code === 0) {
+      if (res.data.json.user_info_list.length === 0) {
+        ElMessage.error('未查询到该用户信息')
+        return
+      }
+
+      // 处理查询结果
+      tableData.value = res.data.json.user_info_list
+      ElMessage.success('查询成功')
+
+      // 更新 flagBool 属性
+      for (const item of tableData.value) {
+        item.flagBool = item.flag === '1'
+      }
+    } else {
+      ElMessage.error(`查询失败: ${res.data.message}`)
+    }
+  } catch (error) {
+    ElMessage.error('查询失败，请重试')
   }
 }
-
 const sendRequest = (action: 'checked' | 'unchecked') => {
   // 模拟发送请求到后台服务器，实际项目中请使用 Axios 或 Fetch API 发送请求
   console.log(`发送${action}请求到后台服务器`)
 }
 
-onMounted(() => {
-  getUserInfo()
+onMounted(async () => {
+  const key = route.query.hash || ''
+  if (key) {
+    console.log('key', key)
+    const res = await viewUserInfo({ hash: key })
+    if (res.data.code === 0) {
+      tableData.value = res.data.json.user_info_list
+      for (const item of tableData.value) {
+        item.flagBool = item.flag === '1'
+      }
+    }
+    console.log('res', res.data.json.user_info_list)
+  } else {
+    getUserInfo()
+  }
 })
 </script>
 

@@ -15,20 +15,12 @@ export const checkUserInfo = (data: any) => {
     return request({
         url: '/checkUserInfo',
         method: 'post',
-        data: {
-            Flag: data
-        },
+        data
 
     })
 }
-// 查询用户信息接口 不传就直接全整个列表返回你
-export const viewUserInfoAll = () => {
-    return request({
-        url: '/viewUserInfo',
-        method: 'post',
-        data: {}
-    })
-}
+
+
 
 
 // type UserInfo struct {
@@ -46,24 +38,22 @@ export const viewUserInfoAll = () => {
 //     UploadInfoList []UploadInfo `json:"upload_info_list"`
 //    }
 
-
+// 返回字段
+//    type UploadInfo struct {
+//     FileName string `json:"file_name"`
+//     Url      string `json:"url"`
+//    }
 
 // 查询用户信息接口 要筛选就传对应字段    id 用户名 手机号 身份证 只能筛选这四个
 export const viewUserInfo = (data: any) => {
     return request({
         url: '/viewUserInfo',
         method: 'post',
-        data: {
-            id: data
-        }
+        data
     })
 }
 
 
-// 返回字段
-//    type UploadInfo struct {
-//     FileName string `json:"file_name"`
-//     Url      string `json:"url"`
-//    }
+
 
 

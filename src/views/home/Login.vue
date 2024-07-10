@@ -72,16 +72,15 @@ const handleLogin = () => {
       const res = await Login(loginForm.value)
       console.log('res', res.data.json.token)
 
-      if (res.status === 200) {
+      if (res.data.code === 0) {
         ElMessage.success('登录成功')
-
         const storedToken = localStorage.getItem('token')
         console.log('storedToken', storedToken)
         useHomeStore().setToken(res.data.json.token)
         if (storedToken == null) {
           localStorage.setItem('token', res.data.json.token)
         }
-        router.push('/')
+        router.push({ path: '/', query: { key: storedToken } })
       } else {
         ElMessage.error(res.statusText)
       }
@@ -167,5 +166,17 @@ const handleLogin = () => {
   font-weight: 500;
   line-height: normal;
   margin-top: 20px;
+}
+@media (max-width: 600px) {
+  :deep(.el-input__wrapper) {
+    display: flex;
+    width: 90vw !important;
+    padding: 12px 11px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 8px;
+    background: #f6f6f6;
+    box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.08);
+  }
 }
 </style>
