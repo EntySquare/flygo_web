@@ -345,6 +345,7 @@ const compressAndUploadVideo = async (file: File, hash: string) => {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  color: #404b7c;
 
   :deep(.el-input__wrapper) {
     display: flex;
