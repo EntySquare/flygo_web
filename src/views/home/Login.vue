@@ -80,7 +80,7 @@ const handleLogin = () => {
         if (storedToken == null) {
           localStorage.setItem('token', res.data.json.token)
         }
-        router.push({ path: '/', query: { key: storedToken } })
+        router.push({ path: '/'})
       } else {
         ElMessage.error(res.statusText)
       }
