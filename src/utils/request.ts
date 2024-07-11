@@ -35,6 +35,9 @@ let fileRequest = axios.create({
 // 设置请求拦截器
 fileRequest.interceptors.request.use(
     config => {
+        // const token = useHomeStore().Token
+        const storedToken = localStorage.getItem('token')
+        config.headers.token = storedToken
         return config
     },
     err => {

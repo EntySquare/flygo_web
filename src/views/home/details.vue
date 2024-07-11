@@ -61,9 +61,9 @@
         <div class="phone_Mobile_title">是否KYC :</div>
         <!-- <div class="phone_Mobile">{{ tableitem?.flag }}</div> -->
         <el-checkbox
-          v-model="tableitem.flagBool"
-          size="large"
-          @change="handleChange(Number(tableitem.flagBool), tableitem.hash)"
+            v-model="tableitem.flagBool"
+            size="large"
+            @change="handleChange(Number(tableitem.flagBool), tableitem.hash)"
         />
       </div>
       <a :href="tableitem.contractUrl" target="_blank">
@@ -83,23 +83,23 @@
         <div class="phone_Mobile">點擊上傳</div>
         <!-- 隐藏的文件选择器 -->
         <input
-          type="file"
-          ref="videoInput"
-          accept="video/*"
-          style="display: none"
-          @change="handleFileChange($event, tableitem.hash)"
+            type="file"
+            ref="videoInput"
+            accept="video/*"
+            style="display: none"
+            @change="handleFileChange($event, tableitem.hash)"
         />
       </div>
       <div
-        class="phone_father"
-        @click="viewClick(tableitem.idCardFUrl, 'idcardF')"
+          class="phone_father"
+          @click="viewClick(tableitem.idCardFUrl, 'idcardF')"
       >
         <div class="phone_Mobile_title">查看身份證正面 :</div>
         <div class="phone_Mobile">點擊查看</div>
       </div>
       <div
-        class="phone_father"
-        @click="viewClick(tableitem.idCardBUrl, 'idcardB')"
+          class="phone_father"
+          @click="viewClick(tableitem.idCardBUrl, 'idcardB')"
       >
         <div class="phone_Mobile_title">查看身份證背面 :</div>
         <div class="phone_Mobile">點擊查看</div>
@@ -108,27 +108,27 @@
 
     <!-- 图片预览对话框 -->
     <el-dialog
-      v-model="dialogVisible"
-      :title="dialogTitle"
-      :close-on-click-modal="true"
-      :close-on-press-escape="true"
-      :show-close="true"
-      width="90%"
+        v-model="dialogVisible"
+        :title="dialogTitle"
+        :close-on-click-modal="true"
+        :close-on-press-escape="true"
+        :show-close="true"
+        width="90%"
     >
       <img
-        :src="dialogUrl"
-        alt="查看身份證"
-        style="width: 100%; height: auto"
+          :src="dialogUrl"
+          alt="查看身份證"
+          style="width: 100%; height: auto"
       />
     </el-dialog>
   </div>
 </template>
 <script lang="ts" setup>
-import { checkUserInfo, uploadFile, viewUserInfo } from '@/api/login'
+import {checkUserInfo, downloadFile, uploadFile, viewUserInfo} from '@/api/login'
 import ffmpegFunctions from '@/utils/ffmpeg'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {onMounted, ref} from 'vue'
+import {useRoute} from 'vue-router'
 
 // if()
 interface RuleFormRequest {
@@ -168,21 +168,21 @@ const handleChange = async (newValue: Number, hash: string) => {
 
   try {
     const confirmed = await ElMessageBox.confirm(
-      `確定要${newValue ? '' : '取消'}勾選嗎?`,
-      '提示',
-      {
-        confirmButtonText: '確定',
-        cancelButtonText: '取消',
-        type: newValue ? 'info' : 'warning'
-      }
+        `確定要${newValue ? '' : '取消'}勾選嗎?`,
+        '提示',
+        {
+          confirmButtonText: '確定',
+          cancelButtonText: '取消',
+          type: newValue ? 'info' : 'warning'
+        }
     )
     if (confirmed) {
-      const res = await checkUserInfo({ hash: hash, flag: newValue.toString() })
+      const res = await checkUserInfo({hash: hash, flag: newValue.toString()})
       if (res.data.code !== 0) {
         throw new Error('操作失敗')
       } else {
         // 刷新页面
-        viewUserInfo({ hash: key })
+        viewUserInfo({hash: key})
       }
     } else {
       tableitem.value!.flagBool = tableitem.value!.flag === '1'
@@ -194,14 +194,37 @@ const handleChange = async (newValue: Number, hash: string) => {
   }
 }
 
-const viewClick = (link: string, type: 'idcardF' | 'idcardB') => {
-  dialogUrl.value = link
+const viewClick = async (link: string, type: 'idcardF' | 'idcardB') => {
+  try {
+    const response = await downloadFile({"url": link})
+    if (response.data.code === 0) {
+      const byteArray = stringToUint8Array(response.data.json.img);
+      const blob = new Blob([byteArray], {type: 'image/png'});
+      dialogUrl.value = URL.createObjectURL(blob);
+    } else {
+      console.error('圖片下載失敗:', response.data.json.message);
+      return
+    }
+  } catch (error) {
+    console.error('圖片下載失敗:', error);
+    return
+  }
+  // dialogUrl.value = link
   if (type === 'idcardF') {
     dialogTitle.value = '身份證正面預覽'
   } else if (type === 'idcardB') {
     dialogTitle.value = '身份證背面預覽'
   }
   dialogVisible.value = true
+}
+
+const stringToUint8Array = (byteString: string) => {
+  const byteCharacters = atob(byteString); // Decode base64 string
+  const byteArray = new Uint8Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteArray[i] = byteCharacters.charCodeAt(i);
+  }
+  return byteArray;
 }
 
 const SourceOfFundsValuefun = (form: number) => {
@@ -239,7 +262,7 @@ const key = route.query.hash || ''
 onMounted(async () => {
   if (key) {
     console.log('key', key)
-    const res = await viewUserInfo({ hash: key })
+    const res = await viewUserInfo({hash: key})
     if (res.data.code === 0) {
       tableitem.value = res.data.json.user_info_list[0]
       tableitem.value!.flagBool = tableitem.value!.flag === '1'
@@ -286,7 +309,8 @@ const compressAndUploadVideo = async (file: File, hash: string) => {
       }
       const reader = new FileReader()
 
-      reader.onload = () => {}
+      reader.onload = () => {
+      }
       reader.onerror = () => {
         ElMessage.error('影片讀取失敗')
         return false
@@ -294,10 +318,10 @@ const compressAndUploadVideo = async (file: File, hash: string) => {
 
       try {
         const videoBlob = (await ffmpegFunctions.compressVideo(
-          file,
-          file.name,
-          file.type,
-          videoMsg.value
+            file,
+            file.name,
+            file.type,
+            videoMsg.value
         )) as Blob
         const formData = new FormData()
         formData.append(`${hash}_video`, videoBlob)
@@ -306,7 +330,7 @@ const compressAndUploadVideo = async (file: File, hash: string) => {
           reader.readAsDataURL(file)
           ElMessage.success('影片上傳成功')
           //刷新页面
-          viewUserInfo({ hash: key })
+          viewUserInfo({hash: key})
           return true
         } else {
           ElMessage.error('影片上傳失敗')
@@ -332,9 +356,11 @@ const compressAndUploadVideo = async (file: File, hash: string) => {
   width: 100%;
   background: #dbdaee;
 }
+
 .phone_Mobile_title {
   color: #404b7c;
 }
+
 .phone {
   padding: 20px 5px;
   font-family: Poppins;
@@ -357,6 +383,7 @@ const compressAndUploadVideo = async (file: File, hash: string) => {
     background: #f6f6f6;
     box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.08);
   }
+
   :deep(.el-input__inner) {
     font-family: Poppins;
     font-size: 16px;
@@ -374,6 +401,7 @@ const compressAndUploadVideo = async (file: File, hash: string) => {
     background: #f6f6f6;
     box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.08);
     height: 50px;
+
     .phone_id,
     .phone_name,
     .phone_id_card,
@@ -381,6 +409,7 @@ const compressAndUploadVideo = async (file: File, hash: string) => {
       color: #000;
     }
   }
+
   .details {
     display: flex;
     justify-content: center;

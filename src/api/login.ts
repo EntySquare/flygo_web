@@ -60,6 +60,13 @@ export const uploadFile = (data: any, headers: any) => {
     })
 }
 
+export const downloadFile = (data:any) => {
+    return fileRequest({
+        url: '/downloadImg',
+        method: 'post',
+        data,
+    })
+}
 
 
 
