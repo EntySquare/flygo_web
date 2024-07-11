@@ -1,6 +1,14 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import path from "path";
+
+// 自定义中间件函数
+const customHeadersMiddleware = (req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+  next();
+};
+
 // https://vitejs.dev/config/
 export default defineConfig({
   base: "/", // 设置打包路径
@@ -60,17 +68,24 @@ export default defineConfig({
     port: 8080, // 端口号
     host: "0.0.0.0",
     proxy: {
-      "/api": {
+      "/app": {
         target: "", // 后台接口
         changeOrigin: true,
         secure: false, // 如果是https接口，需要配置这个参数
         ws: true, //websocket支持
-        rewrite: (path) => path.replace(/^\/api/, ""), // 重写接口
+        rewrite: (path) => path.replace(/^\/app/, ""), // 重写接口
       },
     },
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Embedder-Policy': 'require-corp'
+    },
+    configureServer: (server) => {
+      server.middlewares.use((req, res, next) => {
+        res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+        res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+        next();
+      });
     }
   },
   // 引入第三方的配置
