@@ -15,7 +15,7 @@ body {
     height: 100%;
     width: 100vw;
     color: #fff;
-    user-select: none; // 不能选中文字
+    user-select: text !important; // 不能选中文字
     overflow-x: hidden; // 隐藏x轴滚动条
 }
 
@@ -65,7 +65,7 @@ ul {
 }
 
 #app {
-    user-select: none; // 不能选中文字
+    user-select: text !important; // 不能选中文字
     display: flex; // flex布局
     flex-direction: column; // 垂直布局
     justify-content: space-between; // 两端对齐
