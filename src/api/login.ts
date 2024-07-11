@@ -1,4 +1,4 @@
-import request from '@/utils/request'
+import {request, fileRequest} from '@/utils/request'
 
 export const Login = (data: any) => {
     return request({
@@ -21,8 +21,6 @@ export const checkUserInfo = (data: any) => {
 }
 
 
-
-
 // type UserInfo struct {
 //     Hash           string       `json:"hash"`
 //     Name           string       `json:"name"`
@@ -32,9 +30,9 @@ export const checkUserInfo = (data: any) => {
 //     Amount         float64      `json:"amount"`
 //     BuyOrSell      int          `json:"buy_or_sell"`
 //     FundingSource  int          `json:"funding_source"`
-//     WalletAddress  string       `json:"wallet_address"` 
-//     Political      int          `json:"political"` 
-//     Flag           string       `json:"flag"`     
+//     WalletAddress  string       `json:"wallet_address"`
+//     Political      int          `json:"political"`
+//     Flag           string       `json:"flag"`
 //     UploadInfoList []UploadInfo `json:"upload_info_list"`
 //    }
 
@@ -53,6 +51,14 @@ export const viewUserInfo = (data: any) => {
     })
 }
 
+export const uploadFile = (data: any, headers: any) => {
+    return fileRequest({
+        url: '/upload',
+        method: 'post',
+        data,
+        headers,
+    })
+}
 
 
 

@@ -27,6 +27,30 @@ request.interceptors.response.use(
         return Promise.reject(err)
     }
 )
+
+let fileRequest = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+    timeout: 300000
+})
+// 设置请求拦截器
+fileRequest.interceptors.request.use(
+    config => {
+        return config
+    },
+    err => {
+        return Promise.reject(err)
+    }
+)
+// 设置响应拦截器
+fileRequest.interceptors.response.use(
+    response => {
+        return response
+    },
+    err => {
+        return Promise.reject(err)
+    }
+)
+
 // 暴露对象
-export default request
+export {request, fileRequest}
 
