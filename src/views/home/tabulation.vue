@@ -243,7 +243,9 @@ const viewClick = async (link: string, type: 'idcardF' | 'idcardB') => {
     const response = await downloadFile({"url": link})
     if (response.data.code === 0) {
       const byteArray = stringToUint8Array(response.data.json.img);
-      const blob = new Blob([byteArray], {type: 'image/png'});
+      const splitLink = link.split('.')
+      const fileType = splitLink[splitLink.length - 1]
+      const blob = new Blob([byteArray], {type: `image/${fileType}`});
       dialogUrl.value = URL.createObjectURL(blob);
     } else {
       ElMessage.error('圖片下載失敗:', response.data.json.message)
@@ -332,16 +334,16 @@ const getUserInfo = async () => {
       for (const item of tableData.value) {
         item.flagBool = item.flag === '1'
         for (const i of item.upload_info_list) {
-          if (i.url.endsWith('.mp4')) {
+          if (i.url.includes('_video.')) {
             item.videoUrl = i.url
           }
-          if (i.url.endsWith('.pdf')) {
+          if (i.url.includes('_pdf.')) {
             item.contractUrl = i.url
           }
-          if (i.url.endsWith('b.png')) {
+          if (i.url.includes('_idcardb.')) {
             item.idCardBUrl = i.url
           }
-          if (i.url.endsWith('f.png')) {
+          if (i.url.includes('_idcardf.')) {
             item.idCardFUrl = i.url
           }
         }
@@ -459,16 +461,16 @@ const handleSubmit = async (type: string) => {
       for (const item of tableData.value) {
         item.flagBool = item.flag === '1'
         for (const i of item.upload_info_list) {
-          if (i.url.endsWith('.mp4')) {
+          if (i.url.includes('_video.')) {
             item.videoUrl = i.url
           }
-          if (i.url.endsWith('.pdf')) {
+          if (i.url.includes('_pdf.')) {
             item.contractUrl = i.url
           }
-          if (i.url.endsWith('b.png')) {
+          if (i.url.includes('_idcardb.')) {
             item.idCardBUrl = i.url
           }
-          if (i.url.endsWith('f.png')) {
+          if (i.url.includes('_idcardf.')) {
             item.idCardFUrl = i.url
           }
         }
@@ -553,16 +555,16 @@ onMounted(async () => {
       for (const item of tableData.value) {
         item.flagBool = item.flag === '1'
         for (const i of item.upload_info_list) {
-          if (i.url.endsWith('.mp4')) {
+          if (i.url.includes('_video.')) {
             item.videoUrl = i.url
           }
-          if (i.url.endsWith('.pdf')) {
+          if (i.url.includes('_pdf.')) {
             item.contractUrl = i.url
           }
-          if (i.url.endsWith('b.png')) {
+          if (i.url.includes('_idcardb.')) {
             item.idCardBUrl = i.url
           }
-          if (i.url.endsWith('f.png')) {
+          if (i.url.includes('_idcardf.')) {
             item.idCardFUrl = i.url
           }
         }

@@ -199,7 +199,9 @@ const viewClick = async (link: string, type: 'idcardF' | 'idcardB') => {
     const response = await downloadFile({"url": link})
     if (response.data.code === 0) {
       const byteArray = stringToUint8Array(response.data.json.img);
-      const blob = new Blob([byteArray], {type: 'image/png'});
+      const splitLink = link.split('.')
+      const fileType = splitLink[splitLink.length - 1]
+      const blob = new Blob([byteArray], {type: `image/${fileType}`});
       dialogUrl.value = URL.createObjectURL(blob);
     } else {
       console.error('圖片下載失敗:', response.data.json.message);
@@ -267,16 +269,16 @@ onMounted(async () => {
       tableitem.value = res.data.json.user_info_list[0]
       tableitem.value!.flagBool = tableitem.value!.flag === '1'
       for (const i of tableitem.value!.upload_info_list) {
-        if (i.url.endsWith('.mp4')) {
+        if (i.url.includes('_video.')) {
           tableitem.value!.videoUrl = i.url
         }
-        if (i.url.endsWith('.pdf')) {
+        if (i.url.includes('_pdf.')) {
           tableitem.value!.contractUrl = i.url
         }
-        if (i.url.endsWith('b.png')) {
+        if (i.url.includes('_idcardb.')) {
           tableitem.value!.idCardBUrl = i.url
         }
-        if (i.url.endsWith('f.png')) {
+        if (i.url.includes('_idcardf.')) {
           tableitem.value!.idCardFUrl = i.url
         }
       }
