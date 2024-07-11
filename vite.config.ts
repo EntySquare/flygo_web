@@ -68,6 +68,10 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, ""), // 重写接口
       },
     },
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp'
+    }
   },
   // 引入第三方的配置
   optimizeDeps: {

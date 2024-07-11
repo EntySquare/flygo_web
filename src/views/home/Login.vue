@@ -1,7 +1,7 @@
 <!-- src/components/Login.vue -->
 <template>
   <div class="login-container">
-    <h2 class="login-title">登录</h2>
+    <h2 class="login-title">登錄</h2>
     <el-form
       :model="loginForm"
       ref="loginFormRef"
@@ -9,22 +9,22 @@
       class="demo-loginForm"
       label-position="top"
     >
-      <el-form-item label="用户名" prop="manager_name ">
+      <el-form-item label="用戶名" prop="manager_name ">
         <el-input
           v-model.trim="loginForm.manager_name"
-          placeholder="请输入用户名"
+          placeholder="請輸入用戶名"
         ></el-input>
       </el-form-item>
-      <el-form-item label="密码" prop="password">
+      <el-form-item label="密碼" prop="password">
         <el-input
           v-model.trim="loginForm.password"
           type="password"
-          placeholder="请输入密码"
+          placeholder="請輸入密碼"
         ></el-input>
       </el-form-item>
       <el-form-item>
         <el-button class="SaveCommit" type="primary" @click="handleLogin"
-          >登录</el-button
+          >登錄</el-button
         >
       </el-form-item>
     </el-form>
@@ -51,9 +51,9 @@ const loginForm = ref<LoginForm>({
 
 const rules = ref({
   manager_name: [
-    { required: true, message: '请输入用户名', trigger: 'change' }
+    { required: true, message: '請輸入用戶名', trigger: 'change' }
   ],
-  password: [{ required: true, message: '请输入密码', trigger: 'change' }]
+  password: [{ required: true, message: '請輸入密碼', trigger: 'change' }]
 })
 
 const loginFormRef = ref()
@@ -73,19 +73,19 @@ const handleLogin = () => {
       console.log('res', res.data.json.token)
 
       if (res.data.code === 0) {
-        ElMessage.success('登录成功')
+        ElMessage.success('登錄成功')
         const storedToken = localStorage.getItem('token')
         console.log('storedToken', storedToken)
         useHomeStore().setToken(res.data.json.token)
         if (storedToken == null) {
           localStorage.setItem('token', res.data.json.token)
         }
-        router.push({ path: '/'})
+        router.push({ path: '/' })
       } else {
         ElMessage.error(res.statusText)
       }
     } else {
-      ElMessage.error('请填写正确的表单信息')
+      ElMessage.error('請填寫正確的表單信息')
     }
   })
 }
