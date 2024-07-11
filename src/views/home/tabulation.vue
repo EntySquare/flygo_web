@@ -197,9 +197,7 @@
       :show-close="true"
       width="40%"
     >
-      <video v-if="videoType" src="dialogUrl"></video>
       <img
-        v-else
         :src="dialogUrl"
         alt="查看身份证正面"
         style="width: 100%; height: auto"
