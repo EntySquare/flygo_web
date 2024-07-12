@@ -3,101 +3,101 @@
     <div class="cont">
       <div class="phone_input">
         <el-form
-            label-position="left"
-            :inline="true"
-            label-width="auto"
-            style="max-width: 100%"
+          label-position="left"
+          :inline="true"
+          label-width="auto"
+          style="max-width: 100%"
         >
           <el-form-item label="hash : ">
             <div class="Landscape">
-              <el-input v-model.trim="formHash"/>
+              <el-input v-model.trim="formHash" />
               <el-button size="small" plain @click="handleSubmit('hash')"
-              >查詢
+                >查詢
               </el-button>
             </div>
           </el-form-item>
           <el-form-item label="姓名 : ">
             <div class="Landscape">
-              <el-input v-model.trim="formName"/>
+              <el-input v-model.trim="formName" />
               <el-button size="small" plain @click="handleSubmit('name')"
-              >查詢
+                >查詢
               </el-button>
             </div>
           </el-form-item>
           <el-form-item label="身份證 : ">
             <div class="Landscape">
-              <el-input v-model.trim="formIdCard"/>
+              <el-input v-model.trim="formIdCard" />
               <el-button size="small" plain @click="handleSubmit('id_card')"
-              >查詢
+                >查詢
               </el-button>
             </div>
           </el-form-item>
           <el-form-item label="手機號 : ">
             <div class="Landscape">
-              <el-input v-model.trim="formPhone"/>
+              <el-input v-model.trim="formPhone" />
               <el-button size="small" plain @click="handleSubmit('phone')"
-              >查詢
+                >查詢
               </el-button>
             </div>
           </el-form-item>
         </el-form>
       </div>
       <el-table :data="tableData" style="width: 100%">
-        <el-table-column v-if="width > 768" prop="hash" label="hash"/>
-        <el-table-column v-if="width > 768" prop="name" label="姓名"/>
-        <el-table-column v-if="width > 768" prop="id_card" label="身份證號碼"/>
-        <el-table-column v-if="width > 768" prop="phone" label="手機號"/>
+        <el-table-column v-if="width > 768" prop="hash" label="hash" />
+        <el-table-column v-if="width > 768" prop="name" label="姓名" />
+        <el-table-column v-if="width > 768" prop="id_card" label="身份證號碼" />
+        <el-table-column v-if="width > 768" prop="phone" label="手機號" />
         <el-table-column
-            width="70%"
-            v-if="width < 768"
-            prop="hash"
-            label="hash"
+          width="70%"
+          v-if="width < 768"
+          prop="hash"
+          label="hash"
         />
         <el-table-column
-            width="68%"
-            v-if="width < 768"
-            prop="name"
-            label="姓名"
+          width="68%"
+          v-if="width < 768"
+          prop="name"
+          label="姓名"
         />
         <el-table-column
-            width="68%"
-            v-if="width < 768"
-            prop="id_card"
-            label="身份證號碼"
+          width="68%"
+          v-if="width < 768"
+          prop="id_card"
+          label="身份證號碼"
         />
         <el-table-column
-            width="70%"
-            v-if="width < 768"
-            prop="phone"
-            label="手機號"
+          width="70%"
+          v-if="width < 768"
+          prop="phone"
+          label="手機號"
         />
         <el-table-column width="70%" v-if="width < 768" label="詳情">
           <template #default="{ row }">
             <el-button
-                class="the_details"
-                type="primary"
-                plain
-                @click="handleClick(row.hash)"
-            >詳情
+              class="the_details"
+              type="primary"
+              plain
+              @click="handleClick(row.hash)"
+              >詳情
             </el-button>
           </template>
         </el-table-column>
 
         <el-table-column
-            v-if="width > 768"
-            prop="mail_address"
-            label="通訊地址"
+          v-if="width > 768"
+          prop="mail_address"
+          label="通訊地址"
         />
-        <el-table-column v-if="width > 768" prop="amount" label="金額"/>
+        <el-table-column v-if="width > 768" prop="amount" label="金額" />
         <el-table-column v-if="width > 768" prop="buy_or_sell" label="買/賣">
           <template #default="{ row }">
             {{ row.buy_or_sell == 1 ? '買' : '賣' }}
           </template>
         </el-table-column>
         <el-table-column
-            v-if="width > 768"
-            prop="funding_source"
-            label="資金來源"
+          v-if="width > 768"
+          prop="funding_source"
+          label="資金來源"
         >
           <template #default="{ row }">
             {{ SourceOfFundsValuefun(row.funding_source) }}
@@ -109,14 +109,14 @@
           </template>
         </el-table-column>
         <el-table-column
-            v-if="width > 768"
-            prop="wallet_address"
-            label="接收方錢包地址"
+          v-if="width > 768"
+          prop="wallet_address"
+          label="接收方錢包地址"
         />
         <el-table-column
-            v-if="width > 768"
-            prop="political"
-            label="是否有五級等以內爲重要政治性職務人士"
+          v-if="width > 768"
+          prop="political"
+          label="是否有五級等以內爲重要政治性職務人士"
         >
           <template #default="{ row }">
             {{ row.political == 1 ? '是' : '否' }}
@@ -125,16 +125,16 @@
         <el-table-column v-if="width > 768" prop="flag" label="是否KYC">
           <template #default="{ row }">
             <el-checkbox
-                v-model="row.flagBool"
-                size="large"
-                @change="handleChange(Number(row.flagBool), row.hash)"
+              v-model="row.flagBool"
+              size="large"
+              @change="handleChange(Number(row.flagBool), row.hash)"
             />
           </template>
         </el-table-column>
         <el-table-column
-            v-if="width > 768"
-            prop="ViewTheContract"
-            label="查看合同"
+          v-if="width > 768"
+          prop="ViewTheContract"
+          label="查看合同"
         >
           <template #default="{ row }">
             <a :href="row.contractUrl" target="_blank">
@@ -149,51 +149,52 @@
             </a>
             <!-- 上传视频按钮 -->
             <el-button
-                type="primary"
-                size="small"
-                plain
-                @click="openFileDialog"
+              v-loading.fullscreen.lock="loading"
+              type="primary"
+              size="small"
+              plain
+              @click="openFileDialog"
             >
               上傳
             </el-button>
 
             <!-- 隐藏的文件选择器 -->
             <input
-                type="file"
-                ref="videoInput"
-                accept="video/*"
-                style="display: none"
-                @change="handleFileChange($event, row.hash)"
+              type="file"
+              ref="videoInput"
+              accept="video/*"
+              style="display: none"
+              @change="handleFileChange($event, row.hash)"
             />
           </template>
         </el-table-column>
         <el-table-column
-            v-if="width > 768"
-            prop="ViewIDCardFront"
-            label="查看身份證正面"
+          v-if="width > 768"
+          prop="ViewIDCardFront"
+          label="查看身份證正面"
         >
           <template #default="{ row }">
             <el-button
-                type="primary"
-                size="small"
-                @click="viewClick(row.idCardFUrl, 'idcardF')"
-                plain
+              type="primary"
+              size="small"
+              @click="viewClick(row.idCardFUrl, 'idcardF')"
+              plain
             >
               查看
             </el-button>
           </template>
         </el-table-column>
         <el-table-column
-            v-if="width > 768"
-            prop="ViewIDCardBack"
-            label="查看身份證背面"
+          v-if="width > 768"
+          prop="ViewIDCardBack"
+          label="查看身份證背面"
         >
           <template #default="{ row }">
             <el-button
-                type="primary"
-                size="small"
-                @click="viewClick(row.idCardBUrl, 'idcardB')"
-                plain
+              type="primary"
+              size="small"
+              @click="viewClick(row.idCardBUrl, 'idcardB')"
+              plain
             >
               查看
             </el-button>
@@ -204,28 +205,33 @@
 
     <!-- 图片预览对话框 -->
     <el-dialog
-        v-model="dialogVisible"
-        :title="dialogTitle"
-        :close-on-click-modal="true"
-        :close-on-press-escape="true"
-        :show-close="true"
-        width="40%"
+      v-model="dialogVisible"
+      :title="dialogTitle"
+      :close-on-click-modal="true"
+      :close-on-press-escape="true"
+      :show-close="true"
+      width="40%"
     >
       <img
-          :src="dialogUrl"
-          alt="查看身份證"
-          style="width: 100%; height: auto"
+        :src="dialogUrl"
+        alt="查看身份證"
+        style="width: 100%; height: auto"
       />
     </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue'
-import {checkUserInfo, uploadFile, viewUserInfo, downloadFile} from '@/api/login'
-import {ElMessage, ElMessageBox} from 'element-plus'
+import { onMounted, ref } from 'vue'
+import {
+  checkUserInfo,
+  uploadFile,
+  viewUserInfo,
+  downloadFile
+} from '@/api/login'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import router from '@/router'
-import {useRoute} from 'vue-router'
+import { useRoute } from 'vue-router'
 import ffmpegFunctions from '@/utils/ffmpeg'
 
 // 使用 window.innerWidth 和 window.innerHeight
@@ -237,22 +243,24 @@ const dialogVisible = ref(false)
 const dialogUrl = ref('')
 const dialogTitle = ref('')
 const videoType = ref(false)
+const loading = ref(false)
 
 const viewClick = async (link: string, type: 'idcardF' | 'idcardB') => {
+  loading.value = true
   try {
-    const response = await downloadFile({"url": link})
+    const response = await downloadFile({ url: link })
     if (response.data.code === 0) {
-      const byteArray = stringToUint8Array(response.data.json.img);
+      const byteArray = stringToUint8Array(response.data.json.img)
       const splitLink = link.split('.')
       const fileType = splitLink[splitLink.length - 1]
-      const blob = new Blob([byteArray], {type: `image/${fileType}`});
-      dialogUrl.value = URL.createObjectURL(blob);
+      const blob = new Blob([byteArray], { type: `image/${fileType}` })
+      dialogUrl.value = URL.createObjectURL(blob)
     } else {
       ElMessage.error('圖片下載失敗:', response.data.json.message)
       return
     }
   } catch (error) {
-    ElMessage.error('圖片下載失敗:');
+    ElMessage.error('圖片下載失敗:')
     return
   }
   // dialogUrl.value = link
@@ -262,15 +270,16 @@ const viewClick = async (link: string, type: 'idcardF' | 'idcardB') => {
     dialogTitle.value = '身份證背面預覽'
   }
   dialogVisible.value = true
+  loading.value = false
 }
 
 const stringToUint8Array = (byteString: string) => {
-  const byteCharacters = atob(byteString); // Decode base64 string
-  const byteArray = new Uint8Array(byteCharacters.length);
+  const byteCharacters = atob(byteString) // Decode base64 string
+  const byteArray = new Uint8Array(byteCharacters.length)
   for (let i = 0; i < byteCharacters.length; i++) {
-    byteArray[i] = byteCharacters.charCodeAt(i);
+    byteArray[i] = byteCharacters.charCodeAt(i)
   }
-  return byteArray;
+  return byteArray
 }
 
 // 或者使用 document.documentElement.clientWidth 和 document.documentElement.clientHeight
@@ -353,7 +362,7 @@ const getUserInfo = async () => {
   }
 }
 const getKycInfo = async (flag: Number, hash: string) => {
-  return await checkUserInfo({hash: hash, flag: flag.toString()})
+  return await checkUserInfo({ hash: hash, flag: flag.toString() })
 }
 
 const handleChange = async (newValue: Number, hash: string) => {
@@ -361,13 +370,13 @@ const handleChange = async (newValue: Number, hash: string) => {
 
   try {
     const confirmed = await ElMessageBox.confirm(
-        `確定要${newValue ? '' : '取消'}勾選嗎?`,
-        '提示',
-        {
-          confirmButtonText: '確定',
-          cancelButtonText: '取消',
-          type: newValue ? 'info' : 'warning'
-        }
+      `確定要${newValue ? '' : '取消'}勾選嗎?`,
+      '提示',
+      {
+        confirmButtonText: '確定',
+        cancelButtonText: '取消',
+        type: newValue ? 'info' : 'warning'
+      }
     )
     if (confirmed) {
       const res = await getKycInfo(newValue, hash)
@@ -427,16 +436,16 @@ const handleSubmit = async (type: string) => {
   // 根据 type 设定查询参数
   switch (type) {
     case 'hash':
-      queryParam = {hash: formHash.value}
+      queryParam = { hash: formHash.value }
       break
     case 'name':
-      queryParam = {name: formName.value}
+      queryParam = { name: formName.value }
       break
     case 'id_card':
-      queryParam = {id_card: formIdCard.value}
+      queryParam = { id_card: formIdCard.value }
       break
     case 'phone':
-      queryParam = {phone: formPhone.value}
+      queryParam = { phone: formPhone.value }
       break
     default:
       ElMessage.error('無效的查詢類型')
@@ -498,14 +507,14 @@ const handleFileChange = async (event: Event, hash: string) => {
 const compressAndUploadVideo = async (file: File, hash: string) => {
   if (file) {
     if (file.type.startsWith('video/')) {
+      loading.value = true
       if (file.size > 500 * 1024 * 1024) {
         ElMessage.error('影片需小於500mb')
         return false
       }
       const reader = new FileReader()
 
-      reader.onload = () => {
-      }
+      reader.onload = () => {}
       reader.onerror = () => {
         ElMessage.error('影片讀取失敗')
         return false
@@ -513,10 +522,10 @@ const compressAndUploadVideo = async (file: File, hash: string) => {
 
       try {
         const videoBlob = (await ffmpegFunctions.compressVideo(
-            file,
-            file.name,
-            file.type,
-            videoMsg.value
+          file,
+          file.name,
+          file.type,
+          videoMsg.value
         )) as Blob
         const formData = new FormData()
         formData.append(`${hash}_video`, videoBlob)
@@ -537,6 +546,8 @@ const compressAndUploadVideo = async (file: File, hash: string) => {
         console.error('Upload error:', error) // 更详细的错误信息
 
         return false
+      } finally {
+        loading.value = false
       }
     } else {
       ElMessage.error('請選擇視訊文件')
@@ -549,7 +560,7 @@ onMounted(async () => {
   const key = route.query.hash || ''
   if (key) {
     console.log('key', key)
-    const res = await viewUserInfo({hash: key})
+    const res = await viewUserInfo({ hash: key })
     if (res.data.code === 0) {
       tableData.value = res.data.json.user_info_list
       for (const item of tableData.value) {

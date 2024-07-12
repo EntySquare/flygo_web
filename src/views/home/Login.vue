@@ -82,7 +82,7 @@ const handleLogin = () => {
         }
         router.push({ path: '/' })
       } else {
-        ElMessage.error(res.statusText)
+        ElMessage.error('登錄失敗')
       }
     } else {
       ElMessage.error('請填寫正確的表單信息')
