@@ -528,7 +528,7 @@ const compressAndUploadVideo = async (file: File, hash: string) => {
           videoMsg.value
         )) as Blob
         const formData = new FormData()
-        formData.append(`${hash}_video`, videoBlob)
+        formData.append(`${hash}_video.mp4`, videoBlob)
         const response = await uploadFile(formData, 'multipart/form-data')
         if (response.data.code === 0) {
           reader.readAsDataURL(file)
