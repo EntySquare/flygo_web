@@ -336,7 +336,7 @@ if (!storedToken) {
 }
 const tableData = ref<RuleFormRequest[]>([])
 const getUserInfo = async () => {
-  if (storedToken) {
+
     const res = await viewUserInfo({})
     if (res.data.code === 0) {
       tableData.value = res.data.json.user_info_list
@@ -359,7 +359,7 @@ const getUserInfo = async () => {
       }
     }
     console.log('res', res.data.json.user_info_list)
-  }
+  
 }
 const getKycInfo = async (flag: Number, hash: string) => {
   return await checkUserInfo({ hash: hash, flag: flag.toString() })
@@ -595,6 +595,7 @@ onMounted(async () => {
 
 .home_view {
   padding: 20px;
+  width: 100vw;
 }
 
 .cont {

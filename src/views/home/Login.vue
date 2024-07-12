@@ -75,11 +75,11 @@ const handleLogin = () => {
       if (res.data.code === 0) {
         ElMessage.success('登錄成功')
         const storedToken = localStorage.getItem('token')
-        console.log('storedToken', storedToken)
-        useHomeStore().setToken(res.data.json.token)
-        if (storedToken == null) {
+
+        // useHomeStore().setToken(res.data.json.token)
+        
           localStorage.setItem('token', res.data.json.token)
-        }
+        
         router.push({ path: '/' })
       } else {
         ElMessage.error('登錄失敗')

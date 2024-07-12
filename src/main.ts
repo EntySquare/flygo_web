@@ -16,6 +16,7 @@ import ElementPlus from "element-plus";
 import 'element-plus/dist/index.css'
 // 导入 element-plus 图标
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import { setRouter } from './utils/request'
 
 
 let pinia = createPinia()
@@ -30,3 +31,5 @@ createApp(App)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     createApp(App).component(key, component)
 }
+// 将 router 实例传递给 axios 配置文件
+setRouter(router)
