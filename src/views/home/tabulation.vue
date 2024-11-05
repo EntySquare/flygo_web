@@ -332,6 +332,7 @@ interface RuleFormRequest {
 
 const storedToken = localStorage.getItem('token')
 if (!storedToken) {
+  ElMessage.error("請先登入");
   router.push('/login')
 }
 const tableData = ref<RuleFormRequest[]>([])

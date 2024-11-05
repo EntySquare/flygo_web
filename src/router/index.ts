@@ -2,6 +2,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import NProgress from "nprogress"; // progress bar
 import "nprogress/nprogress.css"; // progress bar style
+import NotFound from '@/views/NotFound.vue'
 NProgress.configure({ showSpinner: false });
 // 导入 layout
 import layout from '@/App.vue'
@@ -16,8 +17,16 @@ let router = createRouter({
         { path: '/login', component: () => import('@/views/home/Login.vue') },
         { path: '', component: () => import('@/views/home/tabulation.vue') },
         { path: '/details', component: () => import('@/views/home/details.vue') },
+        { path: '/wallet', component: () => import('@/views/wallets/index.vue') },
+        { path: '/echart', component: () => import('@/views/wallets/echart.vue') },
       ]
     },
+    // 404 路由配置
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: NotFound
+    }
   ],
 })
 
