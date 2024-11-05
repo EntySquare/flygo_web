@@ -1,5 +1,10 @@
 <template>
-  <div ref="chartRef" style="width: 100%; height: 90%"></div>
+  <div class="con">
+    <div class="address">錢包地址: {{ address }}</div>
+    <div class="border">
+      <div ref="chartRef" style="width: 100%; height: 100%"></div>
+    </div>
+  </div>
 </template>
   
   <script lang="ts" setup>
@@ -50,6 +55,13 @@ const Details = async () => {
       chartInstance.setOption({
         title: {
           text: "",
+        },
+        tooltip: {
+          trigger: "axis",
+          axisPointer: {
+            type: "none",
+          },
+          // showContent: false, // 不显示 tooltip 内容
         },
         xAxis: {
           type: "category",
@@ -123,6 +135,28 @@ const resizeChart = () => {
 </script>
   
   <style scoped>
-/* 添加样式，确保图表的容器有宽高 */
+.con {
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+}
+.address {
+  color: #000;
+
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+.border {
+  box-sizing: border-box;
+  /* width: 100%; */
+  height: 80%;
+  margin: 0 40px;
+  padding: 24px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  display: flex;
+  /* align-items: center; */
+  justify-content: center;
+}
 </style>
   
