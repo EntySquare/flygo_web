@@ -12,6 +12,7 @@
               type="primary"
               plain
               @click="handleClick(row.address)"
+              v-loading.fullscreen.lock="loading"
               >詳情
             </el-button>
           </template>
@@ -29,21 +30,23 @@ import { ElMessage } from "element-plus";
 
 // 使用 window.innerWidth 和 window.innerHeight
 const width = window.innerWidth;
-
+const loading = ref(false);
 const handleClick = (address: string) => {
+  loading.value = true;
   router.push({
     path: "/echart",
     query: {
       address: address,
     },
   });
+  loading.value = false;
 };
 
 const storedToken = localStorage.getItem("token");
-if (!storedToken) {
-  ElMessage.error("請先登入");
-  router.push("/login");
-}
+// if (!storedToken) {
+//   ElMessage.error("請先登入");
+//   router.push("/login");
+// }
 const tableData = ref([]);
 const getUserInfo = async () => {
   const res = await QueryAllWallets();
