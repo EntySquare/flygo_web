@@ -87,7 +87,7 @@
         </el-form>
       </div>
       <el-table :data="tableData" style="width: 100%" v-loading="loading">
-        <el-table-column prop="ID" label="类型id" />
+        <!-- <el-table-column prop="ID" label="类型id" /> -->
         <el-table-column prop="image_urls" label="类型图片">
           <template #default="{ row }">
             <img v-if="row.image_urls" :src="row.image_urls" alt="" />
@@ -104,16 +104,14 @@
           </template>
         </el-table-column>
         <el-table-column prop="sort" label="排序字段" />
-        <el-table-column prop="status" label="状态">
-          <template #default="{ row }">{{
-            row.status === 0 ? "下架" : "上架"
-          }}</template>
-        </el-table-column>
 
         <el-table-column label="操作">
           <template #default="{ row }">
             <el-button size="small" plain @click="deleteInfo(row.ID)"
               >删除</el-button
+            >
+            <el-button size="small" plain @click="updateInfoclick(row)"
+              >修改</el-button
             >
           </template>
         </el-table-column>
@@ -138,52 +136,20 @@
         :rules="rules"
         ref="AddFormRef"
       >
-        <el-form-item label="类型ID" prop="category_id">
-          <el-input clearable v-model.trim.number="AddForm.category_id" />
-        </el-form-item>
-        <el-form-item label="商品描述" prop="description">
-          <el-input clearable v-model.trim="AddForm.description" />
-        </el-form-item>
-        <el-form-item label="商品名" prop="name">
+        <el-form-item label="类型名" prop="name">
           <el-input clearable v-model.trim="AddForm.name" />
         </el-form-item>
-        <el-form-item label="英文商品名" prop="name_en">
+
+        <el-form-item label="英文类型名" prop="name_en">
           <el-input clearable v-model.trim="AddForm.name_en" />
         </el-form-item>
-        <el-form-item label="拼音商品名" prop="name_pin_yin">
+        <el-form-item label="拼音类型名" prop="name_pin_yin">
           <el-input clearable v-model.trim="AddForm.name_pin_yin" />
         </el-form-item>
-        <el-form-item label="基础价格" prop="price">
-          <el-input clearable v-model.trim="AddForm.price" />
+        <el-form-item label="父级id" prop="parent_id">
+          <el-input clearable v-model.trim.number="AddForm.parent_id" />
         </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-select
-            v-model="AddForm.status"
-            placeholder="Select"
-            style="width: 100%"
-          >
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="基础库存" prop="stock">
-          <el-select
-            v-model="AddForm.stock"
-            placeholder="Select"
-            style="width: 100%"
-          >
-            <el-option
-              v-for="item in options1"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
+
         <el-form-item class="footer">
           <el-button
             plain
@@ -197,13 +163,48 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+    <el-dialog v-model="dialogTableVisible1" title="Shipping address">
+      <el-form :model="updateForm" label-width="auto" style="max-width: 600px">
+        <el-form-item label="类型ID" prop="category_id">
+          <el-input clearable v-model.trim.number="updateForm.category_id" />
+        </el-form-item>
+        <el-form-item label="类型图片" prop="image_urls">
+          <el-input clearable v-model.trim="updateForm.image_urls" />
+        </el-form-item>
+        <el-form-item label="类型名" prop="name">
+          <el-input clearable v-model.trim="updateForm.name" />
+        </el-form-item>
+        <el-form-item label="英文类型名" prop="name_en">
+          <el-input clearable v-model.trim="updateForm.name_en" />
+        </el-form-item>
+        <el-form-item label="拼音类型名" prop="name_pin_yin">
+          <el-input clearable v-model.trim="updateForm.name_pin_yin" />
+        </el-form-item>
+        <el-form-item label="排序字段" prop="sort">
+          <el-input clearable v-model.trim="updateForm.sort" />
+        </el-form-item>
+
+        <el-form-item class="footer">
+          <el-button
+            plain
+            style="width: 48%"
+            @click="dialogTableVisible1 = false"
+            >取消</el-button
+          >
+          <el-button plain style="width: 48%" @click="updateInfo()"
+            >确认</el-button
+          >
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { addProduct } from "@/api/add";
-import { deleteProduct } from "@/api/delete";
+import { addCategory } from "@/api/add";
+import { deleteCategory } from "@/api/delete";
 import { selectCategory } from "@/api/home";
+import { updateCategory } from "@/api/update";
 import { ElMessage } from "element-plus";
 import { onMounted, ref } from "vue";
 
@@ -285,40 +286,27 @@ const handlePageChange = (newPage: number) => {
 };
 const dialogTableVisible = ref(false);
 const AddForm = ref({
-  category_id: null,
-  description: "",
   name: "",
   name_en: "",
   name_pin_yin: "",
-  price: null,
-  status: null,
-  stock: null,
+  parent_id: null,
 });
 const rules = ref({
-  category_id: [
-    { required: true, message: "类型ID不能为空", trigger: "change" },
-    { pattern: /^\d+$/, message: "类型ID只能输入数字", trigger: "change" },
-  ],
-  description: [
-    { required: true, message: "商品描述不能为空", trigger: "change" },
-  ],
-  name: [{ required: true, message: "商品名不能为空", trigger: "change" }],
+  name: [{ required: true, message: "类型名不能为空", trigger: "change" }],
   name_en: [
-    { required: true, message: "英文商品名不能为空", trigger: "change" },
+    { required: true, message: "英文类型名不能为空", trigger: "change" },
   ],
   name_pin_yin: [
-    { required: true, message: "拼音商品名不能为空", trigger: "change" },
+    { required: true, message: "拼音类型名不能为空", trigger: "change" },
   ],
-  price: [{ required: true, message: "基础价格不能为空", trigger: "change" }],
-  status: [{ required: true, message: "请选择状态", trigger: "change" }],
-  stock: [{ required: true, message: "请选择基础库存", trigger: "change" }],
+  parent_id: [{ required: true, message: "父级id不能为空", trigger: "change" }],
 });
 const AddFormRef = ref();
 const addInfo = async () => {
   AddFormRef.value.validate(async (valid: boolean) => {
     if (valid) {
       try {
-        const res = await addProduct(AddForm.value);
+        const res = await addCategory(AddForm.value);
         if (res.data.code === 0) {
           ElMessage.success("添加成功");
           // 清空表单并重置验证状态
@@ -344,7 +332,7 @@ const deleteInfo = async (id: number) => {
   console.log("id", id);
   try {
     loading.value = true;
-    const res = await deleteProduct({ category_id: id });
+    const res = await deleteCategory({ category_id: id });
     if (res.data.code === 0) {
       ElMessage.success("删除成功");
       getInfo();
@@ -356,6 +344,46 @@ const deleteInfo = async (id: number) => {
     loading.value = false;
   }
 };
+const dialogTableVisible1 = ref(false);
+const updateForm = ref({
+  category_id: null,
+  image_urls: "",
+  name: "",
+  name_en: "",
+  name_pin_yin: "",
+  sort: null,
+});
+const updateInfoclick = (row: any) => {
+  updateForm.value = {
+    category_id: row.ID,
+    image_urls: row.image_urls,
+    name: row.name,
+    name_en: row.name_en,
+    name_pin_yin: row.name_pin_yin,
+    sort: row.sort,
+  };
+  dialogTableVisible1.value = true;
+};
+const updateFormRef = ref();
+const updateInfo = async () => {
+  try {
+    const res = await updateCategory(updateForm.value);
+    if (res.data.code === 0) {
+      ElMessage.success("修改成功");
+      // 清空表单并重置验证状态
+      updateFormRef.value.resetFields();
+      dialogTableVisible1.value = false;
+      getInfo();
+    } else {
+      ElMessage.error(res.data.data.message_zh);
+    }
+  } catch {
+    ElMessage.error("请求失败");
+  } finally {
+    // dialogTableVisible1.value = false;
+  }
+};
+
 onMounted(() => {
   getInfo();
 });

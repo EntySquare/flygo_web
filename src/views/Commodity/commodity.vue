@@ -115,6 +115,9 @@
             <el-button size="small" plain @click="deleteInfo(row.ID)"
               >删除</el-button
             >
+            <el-button size="small" plain @click="updateInfoclick(row)"
+              >修改</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -197,6 +200,76 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+    <el-dialog v-model="dialogTableVisible1" title="Shipping address">
+      <el-form :model="AddForm" label-width="auto" style="max-width: 600px">
+        <el-form-item label="类型ID" prop="category_id">
+          <el-input clearable v-model.trim.number="UpdateForm.category_id" />
+        </el-form-item>
+        <el-form-item label="商品描述" prop="description">
+          <el-input clearable v-model.trim="UpdateForm.description" />
+        </el-form-item>
+        <el-form-item label="商品图片" prop="image_urls">
+          <el-input clearable v-model.trim="UpdateForm.image_urls" />
+        </el-form-item>
+        <el-form-item label="商品名" prop="name">
+          <el-input clearable v-model.trim="UpdateForm.name" />
+        </el-form-item>
+        <el-form-item label="英文商品名" prop="name_en">
+          <el-input clearable v-model.trim="UpdateForm.name_en" />
+        </el-form-item>
+        <el-form-item label="拼音商品名" prop="name_pin_yin">
+          <el-input clearable v-model.trim="UpdateForm.name_pin_yin" />
+        </el-form-item>
+        <el-form-item label="基础价格" prop="price">
+          <el-input clearable v-model.trim="UpdateForm.price" />
+        </el-form-item>
+        <el-form-item label="商品id" prop="product_id">
+          <el-input clearable v-model.trim="UpdateForm.product_id" />
+        </el-form-item>
+        <el-form-item label="排序字段" prop="sort">
+          <el-input clearable v-model.trim="UpdateForm.sort" />
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-select
+            v-model="UpdateForm.status"
+            placeholder="Select"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="基础库存" prop="stock">
+          <el-select
+            v-model="UpdateForm.stock"
+            placeholder="Select"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="item in options1"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item class="footer">
+          <el-button
+            plain
+            style="width: 48%"
+            @click="dialogTableVisible1 = false"
+            >取消</el-button
+          >
+          <el-button plain style="width: 48%" @click="UpdateInfo()"
+            >确认</el-button
+          >
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
@@ -204,6 +277,7 @@
 import { addProduct } from "@/api/add";
 import { deleteProduct } from "@/api/delete";
 import { selectCategory } from "@/api/home";
+import { updateProduct } from "@/api/update";
 import { ElMessage } from "element-plus";
 import { onMounted, ref } from "vue";
 
@@ -276,8 +350,8 @@ const ResetgetInfo = () => {
     name: "",
     name_en: "",
     name_pin_yin: "",
-    status: '',
-    stock: '',
+    status: "",
+    stock: "",
     page: 0,
   };
   pagination.value.page = 1;
@@ -361,6 +435,57 @@ const deleteInfo = async (id: number) => {
     loading.value = false;
   }
 };
+
+const dialogTableVisible1 = ref(false);
+const UpdateForm = ref({
+  category_id: "",
+  description: "",
+  image_urls: "",
+  name: "",
+  name_en: "",
+  name_pin_yin: "",
+  price: "",
+  product_id: "",
+  sort: "",
+  status: "",
+  stock: "",
+});
+const updateInfoclick = (row: any) => {
+  UpdateForm.value = {
+    category_id: row.category_id,
+    description: row.description,
+    image_urls: row.image_urls,
+    name: row.name,
+    name_en: row.name_en,
+    name_pin_yin: row.name_pin_yin,
+    price: row.price,
+    product_id: row.product_id,
+    sort: row.sort,
+    status: row.status,
+    stock: row.stock,
+  };
+  dialogTableVisible1.value = true;
+};
+const UpdateFormRef = ref();
+const UpdateInfo = async () => {
+  try {
+    const res = await updateProduct(UpdateForm.value);
+    if (res.data.code === 0) {
+      ElMessage.success("修改成功");
+      // 清空表单并重置验证状态
+      UpdateFormRef.value.resetFields();
+      dialogTableVisible1.value = false;
+      getInfo();
+    } else {
+      ElMessage.error(res.data.data.message_zh);
+    }
+  } catch {
+    ElMessage.error("请求失败");
+  } finally {
+    // dialogTableVisible1.value = false;
+  }
+};
+
 onMounted(() => {
   getInfo();
 });
