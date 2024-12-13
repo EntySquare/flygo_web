@@ -1,446 +1,140 @@
 <template>
-  <div v-if="tableitem" class="w_phone" style="padding: 10px">
-    <div class="phone">
-      <div class="phone_father">
-        <div class="phone_id_title">hash :</div>
-        <div class="phone_id">{{ tableitem?.hash }}</div>
+  <div class="home_view">
+    <div class="cont">
+      <div class="phone_input">
+        <el-form
+          label-position="left"
+          :inline="true"
+          label-width="auto"
+          style="max-width: 100%"
+        >
+          <el-form-item label="hash : ">
+            <div class="Landscape">
+              <el-input v-model.trim="formHash" />
+              <el-button size="small" plain @click="handleSubmit('hash')"
+                >查詢
+              </el-button>
+            </div>
+          </el-form-item>
+          <el-form-item label="姓名 : ">
+            <div class="Landscape">
+              <el-input v-model.trim="formName" />
+              <el-button size="small" plain @click="handleSubmit('name')"
+                >查詢
+              </el-button>
+            </div>
+          </el-form-item>
+          <el-form-item label="身份證 : ">
+            <div class="Landscape">
+              <el-input v-model.trim="formIdCard" />
+              <el-button size="small" plain @click="handleSubmit('id_card')"
+                >查詢
+              </el-button>
+            </div>
+          </el-form-item>
+          <el-form-item label="手機號 : ">
+            <div class="Landscape">
+              <el-input v-model.trim="formPhone" />
+              <el-button size="small" plain @click="handleSubmit('phone')"
+                >查詢
+              </el-button>
+            </div>
+          </el-form-item>
+        </el-form>
       </div>
-      <div class="phone_father">
-        <div class="phone_name_title">姓名 :</div>
-        <div class="phone_name">{{ tableitem?.name }}</div>
-      </div>
-      <div class="phone_father">
-        <div class="phone_id_card_title">身份證號 :</div>
-        <div class="phone_id_card">{{ tableitem?.id_card }}</div>
-      </div>
-      <div class="phone_father">
-        <div class="phone_Mobile_title">手機號 :</div>
-        <div class="phone_Mobile">{{ tableitem?.phone }}</div>
-      </div>
-      <div class="phone_father">
-        <div class="phone_Mobile_title">通訊地址 :</div>
-        <div class="phone_Mobile">{{ tableitem?.mail_address }}</div>
-      </div>
-      <div class="phone_father">
-        <div class="phone_Mobile_title">金額 :</div>
-        <div class="phone_Mobile">{{ tableitem?.amount }}</div>
-      </div>
-      <div class="phone_father">
-        <div class="phone_Mobile_title">買/賣 :</div>
-        <div class="phone_Mobile">
-          {{ tableitem?.buy_or_sell == 1 ? '買' : '賣' }}
-        </div>
-      </div>
-      <div class="phone_father">
-        <div class="phone_Mobile_title">資金來源 :</div>
-        <div class="phone_Mobile">
-          {{ SourceOfFundsValuefun(tableitem.funding_source) }}
-        </div>
-      </div>
-      <div class="phone_father">
-        <div class="phone_Mobile_title">委托买费用途 :</div>
-        <div class="phone_Mobile">
-          {{ UseOfExpensesOptionsfun(tableitem.use_for) }}
-        </div>
-      </div>
-      <div class="phone_father">
-        <div class="phone_Mobile_title">接收方錢包地址 :</div>
-        <div class="phone_Mobile">
-          {{ tableitem?.wallet_address ? tableitem?.wallet_address : '暫無' }}
-        </div>
-      </div>
-      <div class="phone_father">
-        <div class="phone_Mobile_title">
-          是否有五級等以內爲重要政治性職務人士 :
-        </div>
-        <div class="phone_Mobile">
-          {{ tableitem.political == 1 ? '是' : '否' }}
-        </div>
-      </div>
-      <div class="phone_father">
-        <div class="phone_Mobile_title">是否KYC :</div>
-        <!-- <div class="phone_Mobile">{{ tableitem?.flag }}</div> -->
-        <el-checkbox
-          v-model="tableitem.flagBool"
-          size="large"
-          @change="handleChange(Number(tableitem.flagBool), tableitem.hash)"
-        />
-      </div>
-      <a :href="tableitem.contractUrl" target="_blank">
-        <div class="phone_father">
-          <div class="phone_Mobile_title">查看合同 :</div>
-          <div class="phone_Mobile">點擊查看</div>
-        </div>
-      </a>
-      <a v-if="tableitem.videoUrl" :href="tableitem.videoUrl" target="_blank">
-        <div class="phone_father">
-          <div class="phone_Mobile_title">查看視頻 :</div>
-          <div class="phone_Mobile">點擊查看</div>
-        </div>
-      </a>
-      <div
-        class="phone_father"
-        @click="openFileDialog"
-        v-loading.fullscreen.lock="loading"
-      >
-        <div class="phone_Mobile_title">上傳視頻 :</div>
-        <div class="phone_Mobile">點擊上傳</div>
-        <!-- 隐藏的文件选择器 -->
-        <input
-          type="file"
-          ref="videoInput"
-          accept="video/*"
-          style="display: none"
-          @change="handleFileChange($event, tableitem.hash)"
-        />
-      </div>
-      <div
-        class="phone_father"
-        @click="viewClick(tableitem.idCardFUrl, 'idcardF')"
-      >
-        <div class="phone_Mobile_title">查看身份證正面 :</div>
-        <div class="phone_Mobile">點擊查看</div>
-      </div>
-      <div
-        class="phone_father"
-        @click="viewClick(tableitem.idCardBUrl, 'idcardB')"
-      >
-        <div class="phone_Mobile_title">查看身份證背面 :</div>
-        <div class="phone_Mobile">點擊查看</div>
-      </div>
+      <el-table :data="tableData" style="width: 100%" v-loading="loading">
+        <el-table-column prop="hash" label="hash" />
+        <el-table-column prop="name" label="姓名" />
+        <el-table-column prop="id_card" label="身份證號碼" />
+        <el-table-column prop="phone" label="手機號" />
+      </el-table>
     </div>
-
-    <!-- 图片预览对话框 -->
-    <el-dialog
-      v-model="dialogVisible"
-      :title="dialogTitle"
-      :close-on-click-modal="true"
-      :close-on-press-escape="true"
-      :show-close="true"
-      width="90%"
-    >
-      <img
-        :src="dialogUrl"
-        alt="查看身份證"
-        style="width: 100%; height: auto"
-      />
-    </el-dialog>
   </div>
 </template>
-<script lang="ts" setup>
-import {
-  checkUserInfo,
-  downloadFile,
-  uploadFile,
-  viewUserInfo
-} from '@/api/login'
-import router from '@/router'
-import ffmpegFunctions from '@/utils/ffmpeg'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
-const storedToken = localStorage.getItem('token')
-if (!storedToken) {
-  router.push('/login')
-}
-// if()
-interface RuleFormRequest {
-  hash: string // 隐藏字段
-  name: string // 姓名
-  id_card: string // 身份证号码
-  phone: string // 手机号
-  mail_address: string // 通讯地址
-  amount: number // 金额
-  buy_or_sell: number // 买/卖 (1-买, 2-卖)
-  funding_source: number // 资金来源 (1-活期存款, 2-储蓄存款, 3-借贷款, 4-股票, 5-债券, 6-其他)
-  use_for: string // 委托买费用途 (按实际情况处理) 投资理财1/消费性产品2/旅游3/资金周转4/其他5
-  wallet_address: string // 接收方钱包地址
-  political: number // 是否有五级等以内为重要政治性职务人士 (1-是, 2-否)
-  flag: string // 是否KYC
-  flagBool: boolean
-  contractUrl: string // 合同链接
-  videoUrl: string // 视频链接
-  idCardFUrl: string // 身份证正面链接
-  idCardBUrl: string // 身份证背面链接
-  upload_info_list: {
-    file_name: string
-    url: string
-  }[]
-  // ViewTheContract: string // 查看合同
-  // ViewVideo: string // 查看视频
-  // ViewIDCardFront: string // 查看身份证正面
-  // ViewIDCardBack: string // 查看身份证背面
-}
-
-const dialogVisible = ref(false)
-const dialogUrl = ref('')
-const dialogTitle = ref('')
-
-const handleChange = async (newValue: Number, hash: string) => {
-  console.log('newValue', newValue)
-
+  
+  <script lang="ts" setup>
+import { onMounted, ref } from "vue";
+const loading = ref(false);
+// const storedToken = localStorage.getItem("token");
+// if (!storedToken) {
+//   ElMessage.error("請先登入");
+//   router.push('/login')
+// }
+const tableData = ref();
+const getInfo = async () => {
+  const res = await viewUserInfo({});
   try {
-    const confirmed = await ElMessageBox.confirm(
-      `確定要${newValue ? '' : '取消'}勾選嗎?`,
-      '提示',
-      {
-        confirmButtonText: '確定',
-        cancelButtonText: '取消',
-        type: newValue ? 'info' : 'warning'
-      }
-    )
-    if (confirmed) {
-      const res = await checkUserInfo({ hash: hash, flag: newValue.toString() })
-      if (res.data.code !== 0) {
-        throw new Error('操作失敗')
-      } else {
-        // 刷新页面
-        viewUserInfo({ hash: key })
-      }
-    } else {
-      tableitem.value!.flagBool = tableitem.value!.flag === '1'
-      throw new Error('用戶取消了操作')
-    }
-  } catch (error) {
-    tableitem.value!.flagBool = tableitem.value!.flag === '1'
-    throw new Error('用戶取消了操作')
+    loading.value = true;
+  } finally {
+    loading.value = false;
   }
-}
-const loading = ref(false)
-const viewClick = async (link: string, type: 'idcardF' | 'idcardB') => {
-  loading.value = true
-  try {
-    const response = await downloadFile({ url: link })
-    if (response.data.code === 0) {
-      const byteArray = stringToUint8Array(response.data.json.img)
-      const splitLink = link.split('.')
-      const fileType = splitLink[splitLink.length - 1]
-      const blob = new Blob([byteArray], { type: `image/${fileType}` })
-      dialogUrl.value = URL.createObjectURL(blob)
-    } else {
-      ElMessage.error('圖片下載失敗:', response.data.json.message)
-      return
-    }
-  } catch (error) {
-    ElMessage.error('圖片下載失敗:')
-    return
-  }
-  // dialogUrl.value = link
-  if (type === 'idcardF') {
-    dialogTitle.value = '身份證正面預覽'
-  } else if (type === 'idcardB') {
-    dialogTitle.value = '身份證背面預覽'
-  }
-  dialogVisible.value = true
-  loading.value = false
-}
-const stringToUint8Array = (byteString: string) => {
-  const byteCharacters = atob(byteString) // Decode base64 string
-  const byteArray = new Uint8Array(byteCharacters.length)
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteArray[i] = byteCharacters.charCodeAt(i)
-  }
-  return byteArray
-}
+};
 
-const SourceOfFundsValuefun = (form: number) => {
-  if (form == 1) {
-    return '活期存款'
-  } else if (form == 2) {
-    return '儲蓄存款'
-  } else if (form == 3) {
-    return '借貸款'
-  } else if (form == 4) {
-    return '股票'
-  } else if (form == 5) {
-    return '債券'
-  } else if (form == 6) {
-    return '其他'
-  }
-}
-
-const UseOfExpensesOptionsfun = (form: string) => {
-  if (form == '1') {
-    return '投資理財'
-  } else if (form == '2') {
-    return '消費性產品'
-  } else if (form == '3') {
-    return '旅遊'
-  } else if (form == '4') {
-    return '資金周轉'
-  } else if (form == '5') {
-    return '其他'
-  }
-}
-const route = useRoute()
-const tableitem = ref<RuleFormRequest>()
-const key = route.query.hash || ''
 onMounted(async () => {
-  if (key) {
-    console.log('key', key)
-    const res = await viewUserInfo({ hash: key })
-    if (res.data.code === 0) {
-      tableitem.value = res.data.json.user_info_list[0]
-      tableitem.value!.flagBool = tableitem.value!.flag === '1'
-      for (const i of tableitem.value!.upload_info_list) {
-        if (i.url.includes('_video.')) {
-          tableitem.value!.videoUrl = i.url
-        }
-        if (i.url.includes('_pdf.')) {
-          tableitem.value!.contractUrl = i.url
-        }
-        if (i.url.includes('_idcardb.')) {
-          tableitem.value!.idCardBUrl = i.url
-        }
-        if (i.url.includes('_idcardf.')) {
-          tableitem.value!.idCardFUrl = i.url
-        }
-      }
-    }
-    console.log('res', res.data.json.user_info_list)
-  } else {
-  }
-})
-
-const videoInput = ref<HTMLInputElement | null>(null)
-const videoMsg = ref('')
-
-const openFileDialog = () => {
-  videoInput.value?.click()
-}
-const handleFileChange = async (event: Event, hash: string) => {
-  loading.value = true
-  const target = event.target as HTMLInputElement
-  if (target.files && target.files.length > 0) {
-    const file = target.files[0]
-    await compressAndUploadVideo(file, hash)
-    console.log('file', file)
-  }
-  loading.value = false
-}
-const compressAndUploadVideo = async (file: File, hash: string) => {
-  if (file) {
-    if (file.type.startsWith('video/')) {
-      if (file.size > 500 * 1024 * 1024) {
-        ElMessage.error('影片需小於500mb')
-        return false
-      }
-      const reader = new FileReader()
-
-      reader.onload = () => {}
-      reader.onerror = () => {
-        ElMessage.error('影片讀取失敗')
-        return false
-      }
-
-      try {
-        const videoBlob = (await ffmpegFunctions.compressVideo(
-          file,
-          file.name,
-          file.type,
-          videoMsg.value
-        )) as Blob
-        const formData = new FormData()
-        formData.append(`${hash}_video.mp4`, videoBlob)
-        const response = await uploadFile(formData, 'multipart/form-data')
-        if (response.data.code === 0) {
-          reader.readAsDataURL(file)
-          ElMessage.success('影片上傳成功')
-          //刷新页面
-          viewUserInfo({ hash: key })
-          return true
-        } else {
-          ElMessage.error('影片上傳失敗')
-
-          return false
-        }
-      } catch (error) {
-        ElMessage.error('影片上傳失敗')
-        console.error('Upload error:', error) // 更详细的错误信息
-
-        return false
-      }
-    } else {
-      ElMessage.error('請選擇視訊文件')
-      return false
-    }
-  }
-}
+  getInfo();
+});
 </script>
-
-<style scoped lang="less">
-.w_phone {
-  width: 100vw;
-  //不会压缩
-  flex-shrink: 0;
-  background: #dbdaee;
-}
-
-.phone_Mobile_title {
-  color: #404b7c;
-}
-
-.phone {
-  padding: 20px 5px;
-  font-family: Poppins;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
+  
+  <style scoped lang="less">
+.Landscape {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  color: #404b7c;
+}
 
-  :deep(.el-input__wrapper) {
-    display: flex;
-    width: 374px;
-    padding: 10px 11px;
-    align-items: center;
-    gap: 10px;
-    border-radius: 8px;
-    background: #f6f6f6;
-    box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.08);
+.home_view {
+  padding: 20px;
+  width: 100vw;
+}
+
+.cont {
+  padding: 15px;
+  border: 1px solid #eee;
+}
+
+.phone_input {
+  margin-bottom: 20px;
+
+  :deep(.el-button--small) {
+    height: 30px;
+    margin: 0;
+    margin-left: 10px;
   }
+}
 
-  :deep(.el-input__inner) {
-    font-family: Poppins;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-  }
+.el-table {
+  --el-table-header-text-color: #000;
+}
 
-  .phone_father {
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-radius: 8px;
-    background: #f6f6f6;
-    box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.08);
-    height: 50px;
+:deep(.is-leaf) {
+  background-color: #e9f2f8 !important;
+}
 
-    .phone_id,
-    .phone_name,
-    .phone_id_card,
-    .phone_Mobile {
-      color: #000;
-    }
-  }
-
-  .details {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50px;
-    border-radius: 4px;
-    color: #fff;
-    background: #005efe;
-    box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.08);
-  }
+.el-button {
+  margin: 4px;
 }
 
 @media (max-width: 768px) {
+  .home_view {
+    padding: 8px;
+    font-size: 12px !important;
+  }
+
+  .cont {
+    padding: 5px !important;
+  }
+
+  :deep(.el-table__header) {
+    width: 100% !important;
+  }
+
+  :deep(.el-table__body) {
+    width: 100% !important;
+  }
+
+  .the_details {
+    font-size: 12px;
+    margin: 0;
+    padding: 10px;
+  }
 }
 </style>
+  

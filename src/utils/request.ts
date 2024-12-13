@@ -21,9 +21,9 @@ export const setRouter = (routerInstance: any) => {
 // 设置请求拦截器
 request.interceptors.request.use(
     config => {
-        // const token = useHomeStore().Token
-        const storedToken = localStorage.getItem('token')
-        config.headers.token = storedToken
+        // // const token = useHomeStore().Token
+        // const storedToken = localStorage.getItem('token')
+        // config.headers.token = storedToken
         return config
     },
     err => {
@@ -38,7 +38,7 @@ request.interceptors.response.use(
             localStorage.removeItem('token')
             console.log('Token has expired, redirecting to login...')
             if (router) {
-                router.push('/login')
+                // router.push('/login')
             } else {
                 console.error('Router instance is not available.')
             }

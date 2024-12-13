@@ -10,7 +10,7 @@
         >
           <el-form-item label="hash : ">
             <div class="Landscape">
-              <el-input v-model.trim="formHash" />
+              <el-input clearable v-model.trim="formHash" />
               <el-button size="small" plain @click="handleSubmit('hash')"
                 >查詢
               </el-button>
@@ -18,7 +18,7 @@
           </el-form-item>
           <el-form-item label="姓名 : ">
             <div class="Landscape">
-              <el-input v-model.trim="formName" />
+              <el-input clearable v-model.trim="formName" />
               <el-button size="small" plain @click="handleSubmit('name')"
                 >查詢
               </el-button>
@@ -26,7 +26,7 @@
           </el-form-item>
           <el-form-item label="身份證 : ">
             <div class="Landscape">
-              <el-input v-model.trim="formIdCard" />
+              <el-input clearable v-model.trim="formIdCard" />
               <el-button size="small" plain @click="handleSubmit('id_card')"
                 >查詢
               </el-button>
@@ -34,7 +34,7 @@
           </el-form-item>
           <el-form-item label="手機號 : ">
             <div class="Landscape">
-              <el-input v-model.trim="formPhone" />
+              <el-input clearable v-model.trim="formPhone" />
               <el-button size="small" plain @click="handleSubmit('phone')"
                 >查詢
               </el-button>
@@ -91,7 +91,7 @@
         <el-table-column v-if="width > 768" prop="amount" label="金額" />
         <el-table-column v-if="width > 768" prop="buy_or_sell" label="買/賣">
           <template #default="{ row }">
-            {{ row.buy_or_sell == 1 ? '買' : '賣' }}
+            {{ row.buy_or_sell == 1 ? "買" : "賣" }}
           </template>
         </el-table-column>
         <el-table-column
@@ -119,7 +119,7 @@
           label="是否有五級等以內爲重要政治性職務人士"
         >
           <template #default="{ row }">
-            {{ row.political == 1 ? '是' : '否' }}
+            {{ row.political == 1 ? "是" : "否" }}
           </template>
         </el-table-column>
         <el-table-column v-if="width > 768" prop="flag" label="是否KYC">
@@ -222,304 +222,302 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref } from "vue";
 import {
   checkUserInfo,
   uploadFile,
   viewUserInfo,
-  downloadFile
-} from '@/api/login'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import router from '@/router'
-import { useRoute } from 'vue-router'
-import ffmpegFunctions from '@/utils/ffmpeg'
+  downloadFile,
+} from "@/api/login";
+import { ElMessage, ElMessageBox } from "element-plus";
+import router from "@/router";
+import { useRoute } from "vue-router";
+import ffmpegFunctions from "@/utils/ffmpeg";
 
 // 使用 window.innerWidth 和 window.innerHeight
-const width = window.innerWidth
-const height = window.innerHeight
-const route = useRoute()
+const width = window.innerWidth;
+const height = window.innerHeight;
+const route = useRoute();
 
-const dialogVisible = ref(false)
-const dialogUrl = ref('')
-const dialogTitle = ref('')
-const videoType = ref(false)
-const loading = ref(false)
+const dialogVisible = ref(false);
+const dialogUrl = ref("");
+const dialogTitle = ref("");
+const videoType = ref(false);
+const loading = ref(false);
 
-const viewClick = async (link: string, type: 'idcardF' | 'idcardB') => {
-  loading.value = true
+const viewClick = async (link: string, type: "idcardF" | "idcardB") => {
+  loading.value = true;
   try {
-    const response = await downloadFile({ url: link })
+    const response = await downloadFile({ url: link });
     if (response.data.code === 0) {
-      const byteArray = stringToUint8Array(response.data.json.img)
-      const splitLink = link.split('.')
-      const fileType = splitLink[splitLink.length - 1]
-      const blob = new Blob([byteArray], { type: `image/${fileType}` })
-      dialogUrl.value = URL.createObjectURL(blob)
+      const byteArray = stringToUint8Array(response.data.json.img);
+      const splitLink = link.split(".");
+      const fileType = splitLink[splitLink.length - 1];
+      const blob = new Blob([byteArray], { type: `image/${fileType}` });
+      dialogUrl.value = URL.createObjectURL(blob);
     } else {
-      ElMessage.error('圖片下載失敗:', response.data.json.message)
-      return
+      ElMessage.error("圖片下載失敗:", response.data.json.message);
+      return;
     }
   } catch (error) {
-    ElMessage.error('圖片下載失敗:')
-    return
+    ElMessage.error("圖片下載失敗:");
+    return;
   }
   // dialogUrl.value = link
-  if (type === 'idcardF') {
-    dialogTitle.value = '身份證正面預覽'
-  } else if (type === 'idcardB') {
-    dialogTitle.value = '身份證背面預覽'
+  if (type === "idcardF") {
+    dialogTitle.value = "身份證正面預覽";
+  } else if (type === "idcardB") {
+    dialogTitle.value = "身份證背面預覽";
   }
-  dialogVisible.value = true
-  loading.value = false
-}
+  dialogVisible.value = true;
+  loading.value = false;
+};
 
 const stringToUint8Array = (byteString: string) => {
-  const byteCharacters = atob(byteString) // Decode base64 string
-  const byteArray = new Uint8Array(byteCharacters.length)
+  const byteCharacters = atob(byteString); // Decode base64 string
+  const byteArray = new Uint8Array(byteCharacters.length);
   for (let i = 0; i < byteCharacters.length; i++) {
-    byteArray[i] = byteCharacters.charCodeAt(i)
+    byteArray[i] = byteCharacters.charCodeAt(i);
   }
-  return byteArray
-}
+  return byteArray;
+};
 
 // 或者使用 document.documentElement.clientWidth 和 document.documentElement.clientHeight
-const clientWidth = document.documentElement.clientWidth
-const clientHeight = document.documentElement.clientHeight
+const clientWidth = document.documentElement.clientWidth;
+const clientHeight = document.documentElement.clientHeight;
 
-const formHash = ref('')
-const formName = ref('')
-const formIdCard = ref('')
-const formPhone = ref('')
-const videoMsg = ref('')
+const formHash = ref("");
+const formName = ref("");
+const formIdCard = ref("");
+const formPhone = ref("");
+const videoMsg = ref("");
 
 const handleClick = (id: string) => {
   router.push({
-    path: '/details',
+    path: "/details",
     query: {
-      hash: id
-    }
-  })
-}
-const flag = ref('0')
+      hash: id,
+    },
+  });
+};
+const flag = ref("0");
 
 interface RuleFormRequest {
-  hash: string // 隐藏字段
-  name: string // 姓名
-  id_card: string // 身份證號碼
-  phone: string // 手機號
-  mail_address: string // 通讯地址
-  amount: number // 金额
-  buy_or_sell: number // 买/卖 (1-买, 2-卖)
-  funding_source: number // 资金来源 (1-活期存款, 2-储蓄存款, 3-借贷款, 4-股票, 5-债券, 6-其他)
-  use_for: string // 委托买费用途 (按实际情况处理) 投资理财1/消费性产品2/旅游3/资金周转4/其他5
-  wallet_address: string // 接收方钱包地址
-  political: number // 是否有五级等以内为重要政治性职务人士 (1-是, 2-否)
-  flag: string // 是否KYC
-  flagBool: boolean
-  contractUrl: string // 合同链接
-  videoUrl: string // 视频链接
-  idCardFUrl: string // 身份证正面链接
-  idCardBUrl: string // 身份证背面链接
+  hash: string; // 隐藏字段
+  name: string; // 姓名
+  id_card: string; // 身份證號碼
+  phone: string; // 手機號
+  mail_address: string; // 通讯地址
+  amount: number; // 金额
+  buy_or_sell: number; // 买/卖 (1-买, 2-卖)
+  funding_source: number; // 资金来源 (1-活期存款, 2-储蓄存款, 3-借贷款, 4-股票, 5-债券, 6-其他)
+  use_for: string; // 委托买费用途 (按实际情况处理) 投资理财1/消费性产品2/旅游3/资金周转4/其他5
+  wallet_address: string; // 接收方钱包地址
+  political: number; // 是否有五级等以内为重要政治性职务人士 (1-是, 2-否)
+  flag: string; // 是否KYC
+  flagBool: boolean;
+  contractUrl: string; // 合同链接
+  videoUrl: string; // 视频链接
+  idCardFUrl: string; // 身份证正面链接
+  idCardBUrl: string; // 身份证背面链接
   upload_info_list: {
-    file_name: string
-    url: string
-  }[]
+    file_name: string;
+    url: string;
+  }[];
   // ViewTheContract: string // 查看合同
   // ViewVideo: string // 查看视频
   // ViewIDCardFront: string // 查看身份证正面
   // ViewIDCardBack: string // 查看身份证背面
 }
 
-const storedToken = localStorage.getItem('token')
-if (!storedToken) {
-  ElMessage.error("請先登入");
-  router.push('/login')
-}
-const tableData = ref<RuleFormRequest[]>([])
+const storedToken = localStorage.getItem("token");
+// if (!storedToken) {
+//   ElMessage.error("請先登入");
+//   router.push('/login')
+// }
+const tableData = ref<RuleFormRequest[]>([]);
 const getUserInfo = async () => {
-
-    const res = await viewUserInfo({})
-    if (res.data.code === 0) {
-      tableData.value = res.data.json.user_info_list
-      for (const item of tableData.value) {
-        item.flagBool = item.flag === '1'
-        for (const i of item.upload_info_list) {
-          if (i.url.includes('_video.')) {
-            item.videoUrl = i.url
-          }
-          if (i.url.includes('_pdf.')) {
-            item.contractUrl = i.url
-          }
-          if (i.url.includes('_idcardb.')) {
-            item.idCardBUrl = i.url
-          }
-          if (i.url.includes('_idcardf.')) {
-            item.idCardFUrl = i.url
-          }
+  const res = await viewUserInfo({});
+  if (res.data.code === 0) {
+    tableData.value = res.data.json.user_info_list;
+    for (const item of tableData.value) {
+      item.flagBool = item.flag === "1";
+      for (const i of item.upload_info_list) {
+        if (i.url.includes("_video.")) {
+          item.videoUrl = i.url;
+        }
+        if (i.url.includes("_pdf.")) {
+          item.contractUrl = i.url;
+        }
+        if (i.url.includes("_idcardb.")) {
+          item.idCardBUrl = i.url;
+        }
+        if (i.url.includes("_idcardf.")) {
+          item.idCardFUrl = i.url;
         }
       }
     }
-    console.log('res', res.data.json.user_info_list)
-  
-}
+  }
+  console.log("res", res.data.json.user_info_list);
+};
 const getKycInfo = async (flag: Number, hash: string) => {
-  return await checkUserInfo({ hash: hash, flag: flag.toString() })
-}
+  return await checkUserInfo({ hash: hash, flag: flag.toString() });
+};
 
 const handleChange = async (newValue: Number, hash: string) => {
-  console.log('newValue', newValue)
+  console.log("newValue", newValue);
 
   try {
     const confirmed = await ElMessageBox.confirm(
-      `確定要${newValue ? '' : '取消'}勾選嗎?`,
-      '提示',
+      `確定要${newValue ? "" : "取消"}勾選嗎?`,
+      "提示",
       {
-        confirmButtonText: '確定',
-        cancelButtonText: '取消',
-        type: newValue ? 'info' : 'warning'
+        confirmButtonText: "確定",
+        cancelButtonText: "取消",
+        type: newValue ? "info" : "warning",
       }
-    )
+    );
     if (confirmed) {
-      const res = await getKycInfo(newValue, hash)
+      const res = await getKycInfo(newValue, hash);
       if (res.data.code !== 0) {
-        throw new Error('操作失敗')
+        throw new Error("操作失敗");
       } else {
         // 刷新页面
-        getUserInfo()
+        getUserInfo();
       }
     } else {
       for (const item of tableData.value) {
-        item.flagBool = item.flag === '1'
+        item.flagBool = item.flag === "1";
       }
-      throw new Error('用戶取消了操作')
+      throw new Error("用戶取消了操作");
     }
   } catch (error) {
     for (const item of tableData.value) {
-      item.flagBool = item.flag === '1'
+      item.flagBool = item.flag === "1";
     }
-    throw new Error('用戶取消了操作')
+    throw new Error("用戶取消了操作");
   }
-}
+};
 
 const SourceOfFundsValuefun = (form: string) => {
-  if (form == '1') {
-    return '活期存款'
-  } else if (form == '2') {
-    return '儲蓄存款'
-  } else if (form == '3') {
-    return '借貸款'
-  } else if (form == '4') {
-    return '股票'
-  } else if (form == '5') {
-    return '債券'
-  } else if (form == '6') {
-    return '其他'
+  if (form == "1") {
+    return "活期存款";
+  } else if (form == "2") {
+    return "儲蓄存款";
+  } else if (form == "3") {
+    return "借貸款";
+  } else if (form == "4") {
+    return "股票";
+  } else if (form == "5") {
+    return "債券";
+  } else if (form == "6") {
+    return "其他";
   }
-}
+};
 
 const UseOfExpensesOptionsfun = (form: string) => {
-  if (form == '1') {
-    return '投資理財'
-  } else if (form == '2') {
-    return '消費性產品'
-  } else if (form == '3') {
-    return '旅遊'
-  } else if (form == '4') {
-    return '資金周轉'
-  } else if (form == '5') {
-    return '其他'
+  if (form == "1") {
+    return "投資理財";
+  } else if (form == "2") {
+    return "消費性產品";
+  } else if (form == "3") {
+    return "旅遊";
+  } else if (form == "4") {
+    return "資金周轉";
+  } else if (form == "5") {
+    return "其他";
   }
-}
+};
 
 const handleSubmit = async (type: string) => {
-  let queryParam: Record<string, any> = {}
+  let queryParam: Record<string, any> = {};
 
   // 根据 type 设定查询参数
   switch (type) {
-    case 'hash':
-      queryParam = { hash: formHash.value }
-      break
-    case 'name':
-      queryParam = { name: formName.value }
-      break
-    case 'id_card':
-      queryParam = { id_card: formIdCard.value }
-      break
-    case 'phone':
-      queryParam = { phone: formPhone.value }
-      break
+    case "hash":
+      queryParam = { hash: formHash.value };
+      break;
+    case "name":
+      queryParam = { name: formName.value };
+      break;
+    case "id_card":
+      queryParam = { id_card: formIdCard.value };
+      break;
+    case "phone":
+      queryParam = { phone: formPhone.value };
+      break;
     default:
-      ElMessage.error('無效的查詢類型')
-      return
+      ElMessage.error("無效的查詢類型");
+      return;
   }
 
   try {
     // 发起查询请求
-    const res = await viewUserInfo(queryParam)
+    const res = await viewUserInfo(queryParam);
 
     if (res.data.code === 0) {
       if (res.data.json.user_info_list.length === 0) {
-        ElMessage.error('未查詢到該用戶信息')
-        return
+        ElMessage.error("未查詢到該用戶信息");
+        return;
       }
 
       // 处理查询结果
-      tableData.value = res.data.json.user_info_list
-      ElMessage.success('查詢成功')
+      tableData.value = res.data.json.user_info_list;
+      ElMessage.success("查詢成功");
 
       // 更新 flagBool 属性
       for (const item of tableData.value) {
-        item.flagBool = item.flag === '1'
+        item.flagBool = item.flag === "1";
         for (const i of item.upload_info_list) {
-          if (i.url.includes('_video.')) {
-            item.videoUrl = i.url
+          if (i.url.includes("_video.")) {
+            item.videoUrl = i.url;
           }
-          if (i.url.includes('_pdf.')) {
-            item.contractUrl = i.url
+          if (i.url.includes("_pdf.")) {
+            item.contractUrl = i.url;
           }
-          if (i.url.includes('_idcardb.')) {
-            item.idCardBUrl = i.url
+          if (i.url.includes("_idcardb.")) {
+            item.idCardBUrl = i.url;
           }
-          if (i.url.includes('_idcardf.')) {
-            item.idCardFUrl = i.url
+          if (i.url.includes("_idcardf.")) {
+            item.idCardFUrl = i.url;
           }
         }
       }
     } else {
-      ElMessage.error(`查詢失敗: ${res.data.message}`)
+      ElMessage.error(`查詢失敗: ${res.data.message}`);
     }
   } catch (error) {
-    ElMessage.error('查詢失敗，請重試')
+    ElMessage.error("查詢失敗，請重試");
   }
-}
-const videoInput = ref<HTMLInputElement | null>(null)
+};
+const videoInput = ref<HTMLInputElement | null>(null);
 
 const openFileDialog = () => {
-  videoInput.value?.click()
-}
+  videoInput.value?.click();
+};
 const handleFileChange = async (event: Event, hash: string) => {
-  const target = event.target as HTMLInputElement
+  const target = event.target as HTMLInputElement;
   if (target.files && target.files.length > 0) {
-    const file = target.files[0]
-    await compressAndUploadVideo(file, hash)
-    console.log('file', file)
+    const file = target.files[0];
+    await compressAndUploadVideo(file, hash);
+    console.log("file", file);
   }
-}
+};
 const compressAndUploadVideo = async (file: File, hash: string) => {
   if (file) {
-    if (file.type.startsWith('video/')) {
-      loading.value = true
+    if (file.type.startsWith("video/")) {
+      loading.value = true;
       if (file.size > 500 * 1024 * 1024) {
-        ElMessage.error('影片需小於500mb')
-        return false
+        ElMessage.error("影片需小於500mb");
+        return false;
       }
-      const reader = new FileReader()
+      const reader = new FileReader();
 
-      reader.onload = () => {}
+      reader.onload = () => {};
       reader.onerror = () => {
-        ElMessage.error('影片讀取失敗')
-        return false
-      }
+        ElMessage.error("影片讀取失敗");
+        return false;
+      };
 
       try {
         const videoBlob = (await ffmpegFunctions.compressVideo(
@@ -527,66 +525,66 @@ const compressAndUploadVideo = async (file: File, hash: string) => {
           file.name,
           file.type,
           videoMsg.value
-        )) as Blob
-        const formData = new FormData()
-        formData.append(`${hash}_video.mp4`, videoBlob)
-        const response = await uploadFile(formData, 'multipart/form-data')
+        )) as Blob;
+        const formData = new FormData();
+        formData.append(`${hash}_video.mp4`, videoBlob);
+        const response = await uploadFile(formData, "multipart/form-data");
         if (response.data.code === 0) {
-          reader.readAsDataURL(file)
-          ElMessage.success('影片上傳成功')
+          reader.readAsDataURL(file);
+          ElMessage.success("影片上傳成功");
           //刷新页面
-          getUserInfo()
-          return true
+          getUserInfo();
+          return true;
         } else {
-          ElMessage.error('影片上傳失敗')
+          ElMessage.error("影片上傳失敗");
 
-          return false
+          return false;
         }
       } catch (error) {
-        ElMessage.error('影片上傳失敗')
-        console.error('Upload error:', error) // 更详细的错误信息
+        ElMessage.error("影片上傳失敗");
+        console.error("Upload error:", error); // 更详细的错误信息
 
-        return false
+        return false;
       } finally {
-        loading.value = false
+        loading.value = false;
       }
     } else {
-      ElMessage.error('請選擇視訊文件')
-      return false
+      ElMessage.error("請選擇視訊文件");
+      return false;
     }
   }
-}
+};
 
 onMounted(async () => {
-  const key = route.query.hash || ''
+  const key = route.query.hash || "";
   if (key) {
-    console.log('key', key)
-    const res = await viewUserInfo({ hash: key })
+    console.log("key", key);
+    const res = await viewUserInfo({ hash: key });
     if (res.data.code === 0) {
-      tableData.value = res.data.json.user_info_list
+      tableData.value = res.data.json.user_info_list;
       for (const item of tableData.value) {
-        item.flagBool = item.flag === '1'
+        item.flagBool = item.flag === "1";
         for (const i of item.upload_info_list) {
-          if (i.url.includes('_video.')) {
-            item.videoUrl = i.url
+          if (i.url.includes("_video.")) {
+            item.videoUrl = i.url;
           }
-          if (i.url.includes('_pdf.')) {
-            item.contractUrl = i.url
+          if (i.url.includes("_pdf.")) {
+            item.contractUrl = i.url;
           }
-          if (i.url.includes('_idcardb.')) {
-            item.idCardBUrl = i.url
+          if (i.url.includes("_idcardb.")) {
+            item.idCardBUrl = i.url;
           }
-          if (i.url.includes('_idcardf.')) {
-            item.idCardFUrl = i.url
+          if (i.url.includes("_idcardf.")) {
+            item.idCardFUrl = i.url;
           }
         }
       }
     }
-    console.log('res', res.data.json.user_info_list)
+    console.log("res", res.data.json.user_info_list);
   } else {
-    getUserInfo()
+    getUserInfo();
   }
-})
+});
 </script>
 
 <style scoped lang="less">

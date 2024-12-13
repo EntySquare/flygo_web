@@ -16,6 +16,7 @@ import { RouterLink } from "vue-router";
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
   height: 100vh;
   text-align: center;
   background-color: #f5f5f5;
