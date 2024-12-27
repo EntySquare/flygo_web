@@ -12,17 +12,22 @@ let router = createRouter({
   // 设置路由对象
   routes: [
     {
+      path: '/',
+      redirect: '/categories', // 将根路径重定向到 /categories
+    },
+    {
       path: '',
       children: [
         // { path: '/login', component: () => import('@/views/home/Login.vue') },
-        // { path: '', component: () => import('@/views/home/tabulation.vue') },
+        // { path: '/commodity', component: () => import('@/views/Commodity/commodity.vue') },
         { path: '/commodity', component: () => import('@/views/Commodity/commodity.vue') },
-        { path: '/select', component: () => import('@/views/Commodity/product_label.vue') },
         { path: '/specifications', component: () => import('@/views/Specifications/index.vue') },
         { path: '/tags', component: () => import('@/views/tags/tags.vue') },
         { path: '/tagType', component: () => import('@/views/tags/tag_type.vue') },
         { path: '/user', component: () => import('@/views/user/index.vue') },
         { path: '/categories', component: () => import('@/views/Categories/index.vue') },
+        { path: '/purchase', component: () => import('@/views/Purchase/Purchase.vue') },
+        { path: '/Imgmanage', component: () => import('@/views/Imgmanage/index.vue') },
 
       ]
     },

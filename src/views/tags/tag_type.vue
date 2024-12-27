@@ -11,12 +11,12 @@
           label-width="auto"
           style="max-width: 100%"
         >
-          <el-form-item label="所属类别ID : ">
+          <el-form-item label="所属类别名 : ">
             <div class="Landscape">
               <el-input
                 style="width: 175px"
                 clearable
-                v-model.trim.number="form.category_id"
+                v-model.trim.number="form.category_name"
               />
             </div>
           </el-form-item>
@@ -25,19 +25,25 @@
             <el-button size="small" plain @click="ResetgetInfo()"
               >重置</el-button
             >
-            <el-button size="small" plain @click="dialogTableVisible = true"
-              >添加商品</el-button
-            >
           </el-form-item>
         </el-form>
       </div>
       <el-table :data="tableData" style="max-width: 100%" v-loading="loading">
-        <el-table-column prop="product_spec_id" label="商品规格id" />
-        <el-table-column prop="tag_id" label="标签id" />
+        <el-table-column prop="category_name" label="所属类别名" />
+        <el-table-column prop="name" label="标签类型名称" />
+     
+        <!-- <el-table-column prop="product_spec_id" label="商品规格id" />
+        <el-table-column prop="tag_id" label="标签id" /> -->
         <el-table-column label="操作">
           <template #default="{ row }">
-            <el-button size="small" plain @click="deleteInfo(row.ID)"
+            <el-button size="small" plain @click="deleteInfo(row.id)"
               >删除</el-button
+            >
+            <el-button size="small" plain @click="updateInfoclick(row)"
+              >修改</el-button
+            >
+            <el-button size="small" plain @click="AddTagsclick(row)"
+              >添加标签</el-button
             >
           </template>
         </el-table-column>
@@ -54,28 +60,56 @@
         />
       </div>
     </div>
-    <el-dialog v-model="dialogTableVisible" title="Shipping address">
-      <el-form
-        :model="AddForm"
-        label-width="auto"
-        style="max-width: 600px"
-        :rules="rules"
-        ref="AddFormRef"
-      >
-        <el-form-item label="所属类别ID" prop="category_id">
-          <el-input clearable v-model.trim.number="AddForm.category_id" />
-        </el-form-item>
+
+    <el-dialog v-model="dialogTableVisible1" title="标签类型">
+      <el-form :model="updateForm" label-width="auto" style="max-width: 600px">
+        <!-- <el-form-item label="所属类别ID" prop="category_id">
+          <el-input clearable v-model.trim.number="updateForm.category_id" />
+        </el-form-item> -->
         <el-form-item label="标签类型名称" prop="name">
-          <el-input clearable v-model.trim="AddForm.name" />
+          <el-input clearable v-model.trim="updateForm.name" />
         </el-form-item>
+  
+        <!-- <el-form-item label="标签类型ID" prop="tag_type_id">
+          <el-input clearable v-model.trim="updateForm.tag_type_id" />
+        </el-form-item> -->
         <el-form-item class="footer">
           <el-button
             plain
             style="width: 48%"
-            @click="dialogTableVisible = false"
+            @click="dialogTableVisible1 = false"
             >取消</el-button
           >
-          <el-button plain style="width: 48%" @click="addInfo()"
+          <el-button plain style="width: 48%" @click="updateInfo()"
+            >确认</el-button
+          >
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+    <el-dialog v-model="tagsVisible" title="添加标签">
+      <el-form
+        :model="tagsForm"
+        label-width="auto"
+        style="max-width: 600px"
+        :rules="tagsrules"
+        ref="tagsFormRef"
+      >
+        <el-form-item label="标签名称" prop="name">
+          <el-input clearable v-model.trim="tagsForm.name" />
+        </el-form-item>
+        <el-form-item label="标签所属类型ID" prop="tag_type_id">
+          <el-input
+            clearable
+            v-model.trim.number="tagsForm.tag_type_id"
+            disabled
+          />
+        </el-form-item>
+
+        <el-form-item class="footer">
+          <el-button plain style="width: 48%" @click="tagsVisible = false"
+            >取消</el-button
+          >
+          <el-button plain style="width: 48%" @click="tagsInfo()"
             >确认</el-button
           >
         </el-form-item>
@@ -85,15 +119,16 @@
 </template>
     
     <script lang="ts" setup>
-import { addTagType } from "@/api/add";
+import { addTag, addTagType } from "@/api/add";
 import { deleteTagType } from "@/api/delete";
-import { selectTagType } from "@/api/home";
+import { selectTagType } from "@/api/Querying";
+import { updateTagType } from "@/api/update";
 import { ElMessage } from "element-plus";
 import { onMounted, ref } from "vue";
 
 const loading = ref(false);
 const form = ref({
-  category_id: null,
+  category_name: null,
 });
 
 const tableData = ref([]);
@@ -108,10 +143,11 @@ const getInfo = async () => {
     loading.value = true;
     const res = await selectTagType(form.value);
     if (res.data.code === 0) {
-      tableData.value = res.data.data.list; //
-      if (res.data.data.list.length === 0) {
-        ElMessage.error("暂无数据");
+      if (res.data.data.list === null || res.data.data.list.length === 0) {
+        ElMessage("暂无数据");
+        return;
       }
+      tableData.value = res.data.data.list; //
       // pagination.value.total = res.data.data.page_size;
     } else {
       ElMessage.error(res.data.data.message_zh);
@@ -125,7 +161,7 @@ const getInfo = async () => {
 
 const ResetgetInfo = () => {
   form.value = {
-    category_id: null,
+    category_name: null,
   };
   pagination.value.page = 1;
   getInfo();
@@ -135,44 +171,7 @@ const handlePageChange = (newPage: number) => {
   pagination.value.page = newPage;
   getInfo();
 };
-const dialogTableVisible = ref(false);
-const AddForm = ref({
-  category_id: null,
-  name: "",
-});
-const rules = ref({
-  category_id: [
-    { required: true, message: "所属类别ID不能为空", trigger: "change" },
-    { pattern: /^\d+$/, message: "所属类别ID只能输入数字", trigger: "change" },
-  ],
 
-  name: [{ required: true, message: "商品名不能为空", trigger: "change" }],
-});
-const AddFormRef = ref();
-const addInfo = async () => {
-  AddFormRef.value.validate(async (valid: boolean) => {
-    if (valid) {
-      try {
-        const res = await addTagType({ ...AddForm.value });
-        if (res.data.code === 0) {
-          ElMessage.success("添加成功");
-          // 清空表单并重置验证状态
-          AddFormRef.value.resetFields();
-          dialogTableVisible.value = false;
-          getInfo();
-        } else {
-          ElMessage.error(res.data.data.message_zh);
-        }
-      } catch {
-        ElMessage.error("请求失败");
-      } finally {
-        // dialogTableVisible.value = false;
-      }
-    } else {
-      console.log("验证失败");
-    }
-  });
-};
 const deleteInfo = async (id: number) => {
   console.log("id", id);
   try {
@@ -189,6 +188,88 @@ const deleteInfo = async (id: number) => {
     loading.value = false;
   }
 };
+
+const dialogTableVisible1 = ref(false);
+const updateForm = ref({
+  name: "",
+  sort: "",
+  tag_type_id: null,
+});
+const updateInfoclick = (row: any) => {
+  updateForm.value = {
+    name: row.name || "",
+    sort: row.sort || null,
+
+    tag_type_id: row.id || null,
+  };
+  dialogTableVisible1.value = true;
+};
+const updateInfo = async () => {
+  try {
+    const res = await updateTagType(updateForm.value);
+    if (res.data.code === 0) {
+      ElMessage.success("修改成功");
+      // 清空表单并重置验证状态
+
+      dialogTableVisible1.value = false;
+      getInfo();
+    } else {
+      ElMessage.error(res.data.data.message_zh);
+    }
+  } catch {
+    ElMessage.error("请求失败");
+  } finally {
+    // dialogTableVisible1.value = false;
+  }
+};
+
+const tagsVisible = ref(false);
+const tagsForm = ref({
+  name: "",
+  tag_type_id: null,
+});
+const tagsrules = ref({
+  tag_type_id: [
+    { required: true, message: "标签所属类型ID不能为空", trigger: "change" },
+    {
+      pattern: /^\d+$/,
+      message: "标签所属类型ID只能输入数字",
+      trigger: "change",
+    },
+  ],
+
+  name: [{ required: true, message: "标签名称不能为空", trigger: "change" }],
+});
+const tagsFormRef = ref();
+const AddTagsclick = (row: any) => {
+  tagsForm.value.tag_type_id = row.id;
+  tagsVisible.value = true;
+};
+const tagsInfo = async () => {
+  tagsFormRef.value.validate(async (valid: boolean) => {
+    if (valid) {
+      try {
+        const res = await addTag(tagsForm.value);
+        if (res.data.code === 0) {
+          ElMessage.success("添加成功");
+          // 清空表单并重置验证状态
+          tagsFormRef.value.resetFields();
+          tagsVisible.value = false;
+          getInfo();
+        } else {
+          ElMessage.error(res.data.data.message_zh);
+        }
+      } catch {
+        ElMessage.error("请求失败");
+      } finally {
+        // dialogTableVisible.value = false;
+      }
+    } else {
+      console.log("验证失败");
+    }
+  });
+};
+
 onMounted(() => {
   getInfo();
 });

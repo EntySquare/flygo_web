@@ -44,10 +44,10 @@ defineProps<{ data: Array<any> }>();
 
 <style scoped lang="less">
 .tabMenu {
-  height: 100vh;
+  height: 100%;
 
   .el-menu-vertical-demo {
-    height: 100vh;
+    height: 100%;
   }
   ::v-deep(.el-menu-item.is-active) {
     background-color: #333 !important;

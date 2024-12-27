@@ -39,7 +39,7 @@
 import { ref } from "vue";
 import { ElMessage } from "element-plus";
 import router from "@/router";
-import { Login } from "@/api/login";
+// import { Login } from "@/api/login";
 import CryptoJS from "crypto-js";
 import useHomeStore from "@/store/modules/home";
 
@@ -76,27 +76,27 @@ const handleLogin = () => {
       fullscreenLoading.value = true;
       if (valid) {
         // 在此处处理登录逻辑，例如发送请求到服务器进行验证
-        const res = await Login({
-          manager_name: loginForm.value.manager_name,
-          password: loginFormBase64,
-        });
-        console.log("res", res.data.json.token);
+        // const res = await Login({
+        //   manager_name: loginForm.value.manager_name,
+        //   password: loginFormBase64,
+        // });
+        // console.log("res", res.data.json.token);
 
-        if (res.data.code === 0) {
-          ElMessage.success("登錄成功");
-          const storedToken = localStorage.getItem("token");
-          if (storedToken) {
-            localStorage.removeItem("token");
-          }
+        // if (res.data.code === 0) {
+        //   ElMessage.success("登錄成功");
+        //   const storedToken = localStorage.getItem("token");
+        //   if (storedToken) {
+        //     localStorage.removeItem("token");
+        //   }
 
-          // useHomeStore().setToken(res.data.json.token)
+        //   // useHomeStore().setToken(res.data.json.token)
 
-          localStorage.setItem("token", res.data.json.token);
+        //   localStorage.setItem("token", res.data.json.token);
 
-          router.push({ path: "/" });
-        } else {
-          ElMessage.error("登錄失敗");
-        }
+        //   router.push({ path: "/" });
+        // } else {
+        //   ElMessage.error("登錄失敗");
+        // }
       } else {
         ElMessage.error("請填寫正確的表單信息");
       }

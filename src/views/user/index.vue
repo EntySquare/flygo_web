@@ -35,7 +35,11 @@
         <el-table-column prop="full_name" label="姓名" />
         <el-table-column prop="avatar_url" label="头像地址">
           <template #default="{ row }">
-            <img :src="row.avatar_url" alt="" />
+            <img
+              :src="row.avatar_url"
+              alt=""
+              style="width: 50px; height: 50px"
+            />
           </template>
         </el-table-column>
         <el-table-column prop="created_time" label="创建时间" />
@@ -59,7 +63,7 @@
 </template>
       
   <script lang="ts" setup>
-import { userList } from "@/api/home";
+import { userList } from "@/api/Querying";
 import { ElMessage } from "element-plus";
 import { onMounted, ref } from "vue";
 
@@ -94,9 +98,9 @@ const getInfo = async () => {
       console.log("res.data.data", res.data.data);
 
       if (res.data.data.user_list.length === 0) {
-        ElMessage.error("暂无数据");
+        ElMessage("暂无数据");
       }
-      pagination.value.total = res.data.data.page_size;
+      // pagination.value.total = res.data.data.page_size;
     } else {
       ElMessage.error(res.data.data.message_zh);
     }
