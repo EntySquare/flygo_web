@@ -1,7 +1,8 @@
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useWindowSize } from "@/utils/useWindowSize";
+import { useRoute } from "vue-router";
 
 const { width, height } = useWindowSize();
 // 获取 CommonAside 组件实例
@@ -13,21 +14,33 @@ function openCommonAside() {
     commonAsideRef.value.openDrawer();
   }
 }
+const route = useRoute(); // 获取当前路由信息
+const isLoginPage = ref(false);
+
+// 监听路由变化，判断是否为登录页面
+watch(
+  () => route.path,
+  (newPath) => {
+    isLoginPage.value = newPath === "/login";
+  },
+  { immediate: true } // 初始化时立即触发
+);
 </script>
 <template>
   <!-- <Suspense> 是一个用于实现组件延迟加载和异步渲染的组件 -->
   <!-- 一级路由出口 -->
-  <el-container>
+  <el-container v-if="!isLoginPage">
     <!-- <div style="font-size: 30px; background: #000">{{ width }}</div> -->
     <el-aside
       :width="width > 1070 ? '200px' : '140px'"
       class="sidebar"
       v-if="width > 1000"
+      style="position: fixed; height: 100%"
     >
-      <CommonAside />
+      <CommonAside style="height: 100%" />
     </el-aside>
-    <el-aside class="svgcss" v-else @click="openCommonAside">
-      <div>
+    <el-aside style="width: 38px" v-else @click="openCommonAside">
+      <div class="svgcss">
         <svg
           t="1734936777883"
           class="icon"
@@ -48,17 +61,23 @@ function openCommonAside() {
     </el-aside>
 
     <CommonDialog ref="commonAsideRef" />
-    <router-view></router-view>
+    <router-view
+      :style="{
+        marginLeft: width > 1000 ? (width > 1070 ? '200px' : '140px') : '0',
+      }"
+    ></router-view>
   </el-container>
+  <router-view v-else></router-view>
 </template>
 <style scoped lang="less">
 .svgcss {
-  background: #efecec;
+  background: #e9f2f8;
   height: 38px;
   width: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  position: fixed;
 }
 </style>

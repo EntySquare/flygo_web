@@ -16,9 +16,9 @@ let router = createRouter({
       redirect: '/categories', // 将根路径重定向到 /categories
     },
     {
-      path: '',
+      path: '/',
       children: [
-        // { path: '/login', component: () => import('@/views/home/Login.vue') },
+        { path: '/login', component: () => import('@/views/login/Login.vue') },
         // { path: '/commodity', component: () => import('@/views/Commodity/commodity.vue') },
         { path: '/commodity', component: () => import('@/views/Commodity/commodity.vue') },
         { path: '/specifications', component: () => import('@/views/Specifications/index.vue') },

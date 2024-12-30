@@ -396,21 +396,23 @@ const ALLOWED_EXTENSIONS = /\.(jpg|jpeg|png|gif)$/i; // 支持jpg、jpeg、png�
 
 // 文件校验逻辑：校验文件大小和文件扩展名
 const handleBeforeUpload = async (file: File) => {
-  console.log("1111111111111");
-
   // 检查是否超出最大图片数
-  if (
-    Carousel.value == "Tiling" &&
-    raw_images_url_list.value.length >= MAX_IMAGES
-  ) {
-    ElMessage.error(`最多只能上传 ${MAX_IMAGES} 张图片，请先删除多余图片！`);
-  }
   if (
     Carousel.value === "Carousel" &&
     carousel_images_url_list.value.length >= MAX_IMAGES
   ) {
-    ElMessage.error(`最多只能上传 ${MAX_IMAGES} 张图片，请先删除多余图片！`);
+    ElMessage.error(
+      `最多只能上传 ${MAX_IMAGES} 张轮播图图片，请先删除多余图片！`
+    );
     return false;
+  }
+  if (
+    Carousel.value == "Tiling" &&
+    raw_images_url_list.value.length >= MAX_IMAGES
+  ) {
+    ElMessage.error(
+      `最多只能上传 ${MAX_IMAGES} 张平铺图图片，请先删除多余图片！`
+    );
   }
 
   // 校验文件大小
@@ -523,7 +525,7 @@ const searchProduct = async () => {
     return;
   }
   if (hot_product_tableData.value.length === 3) {
-    ElMessage.error("热门商品最多只能设置3个！");
+    ElMessage.error("最多只能设置3个热门商品！请删除后重试");
     return;
   }
   try {
@@ -549,7 +551,7 @@ const searchtoday = async () => {
     return;
   }
   if (today_product_tableData.value.length === 3) {
-    ElMessage.error("今日商品最多只能设置3个！");
+    ElMessage.error("最多只能设置3个今日商品！请删除后重试");
     return;
   }
   console.log(
@@ -645,6 +647,12 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   background: var(--el-fill-color-light);
+}
+:deep(.is-leaf) {
+  background-color: #e9f2f8 !important;
+}
+.el-table {
+  --el-table-header-text-color: #000;
 }
 </style>
         

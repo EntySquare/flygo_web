@@ -44,8 +44,8 @@
         </el-table-column>
       </el-table>
 
-      <div class="fenye">
-        <!-- 分页组件 -->
+      <!-- 分页组件 -->
+      <!-- <div class="fenye">
         <el-pagination
           v-model:current-page="pagination.page"
           :page-size="pagination.pageSize"
@@ -53,7 +53,7 @@
           layout="prev, pager, next, total"
           @current-change="handlePageChange"
         />
-      </div>
+      </div> -->
     </div>
 
     <el-dialog v-model="dialogTableVisible1" title="修改标签">
@@ -61,9 +61,9 @@
         <el-form-item label="标签名称" prop="name">
           <el-input clearable v-model.trim="updateForm.name" />
         </el-form-item>
-        <el-form-item label="标签id" prop="tag_id">
+        <!-- <el-form-item label="标签id" prop="tag_id">
           <el-input clearable v-model.trim.number="updateForm.tag_id" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item class="footer">
           <el-button
             plain
@@ -138,6 +138,7 @@ const ResetgetInfo = () => {
     tag_type_name: "",
   };
   pagination.value.page = 1;
+  
   getInfo();
 };
 
@@ -178,6 +179,10 @@ const updateInfoclick = (row: any) => {
 };
 const updateFormRef = ref();
 const updateInfo = async () => {
+  if (updateForm.value.name.trim() === "") {
+    ElMessage.error("标签名称不能为空");
+    return;
+  }
   try {
     const res = await updateTag(updateForm.value);
     if (res.data.code === 0) {

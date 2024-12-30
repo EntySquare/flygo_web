@@ -141,8 +141,8 @@
         </el-table-column>
       </el-table>
 
+      <!-- 分页组件 -->
       <div class="fenye">
-        <!-- 分页组件 -->
         <el-pagination
           v-model:current-page="pagination.page"
           :page-size="pagination.pageSize"
@@ -154,7 +154,13 @@
     </div>
 
     <el-dialog v-model="dialogTableVisible1" title="修改规格">
-      <el-form :model="updateForm" label-width="auto" style="max-width: 600px">
+      <el-form
+        ref="updateFormRef"
+        :model="updateForm"
+        label-width="auto"
+        :rules="rules"
+        style="max-width: 600px"
+      >
         <el-form-item label="价格" prop="price">
           <el-input clearable v-model.trim="updateForm.price" />
         </el-form-item>
@@ -362,7 +368,8 @@ const getInfo = async () => {
           item.image_urls = JSON.parse(item.image_urls)[0];
         }
       });
-      // pagination.value.total = res.data.data.page_size;
+      pagination.value.total = res.data.data.page_size;
+      pagination.value.pageSize = res.data.data.page_size;
     } else {
       ElMessage.error(res.data.data.message_zh);
     }
@@ -430,26 +437,39 @@ const updateInfoclick = (row: any) => {
   dialogTableVisible1.value = true;
 };
 const updateFormRef = ref();
+const rules = ref({
+  price: [{ required: true, message: "请输入价格", trigger: "change" }],
+  spec_name: [{ required: true, message: "请输入规格名", trigger: "change" }],
+  spec_name_en: [
+    { required: true, message: "请输入英文规格名", trigger: "change" },
+  ],
+  stock: [{ required: true, message: "请输入库存", trigger: "change" }],
+  status: [{ required: true, message: "请选择状态", trigger: "change" }],
+});
 const updateInfo = async () => {
-  try {
-    const res = await updateSpec({
-      ...updateForm.value,
-      status: String(updateForm.value.status),
-    });
-    if (res.data.code === 0) {
-      ElMessage.success("修改成功");
-      // 清空表单并重置验证状态
+  updateFormRef.value.validate(async (valid: boolean) => {
+    if (valid) {
+      try {
+        const res = await updateSpec({
+          ...updateForm.value,
+          status: String(updateForm.value.status),
+        });
+        if (res.data.code === 0) {
+          ElMessage.success("修改成功");
+          // 清空表单并重置验证状态
 
-      dialogTableVisible1.value = false;
-      getInfo();
-    } else {
-      ElMessage.error(res.data.data.message_zh);
+          dialogTableVisible1.value = false;
+          getInfo();
+        } else {
+          ElMessage.error(res.data.data.message_zh);
+        }
+      } catch {
+        ElMessage.error("请求失败");
+      } finally {
+        // dialogTableVisible1.value = false;
+      }
     }
-  } catch {
-    ElMessage.error("请求失败");
-  } finally {
-    // dialogTableVisible1.value = false;
-  }
+  });
 };
 const ProductLabelsList = ref();
 const AddProductLabelsVisible = ref(false);
@@ -476,7 +496,9 @@ const AddProductLabels = async (row: any) => {
     }
     if (res.data.data.list !== null || res.data.data.list.length > 0) {
       ProductLabelsList.value = res.data.data.list;
-      setDefaultSelectedTags(); // 打开弹窗时设置默认选中的标签
+      if (res.data.data.list.tags) {
+        setDefaultSelectedTags(); // 打开弹窗时设置默认选中的标签
+      }
     }
   } else {
     ElMessage.error(res.data.data.message_zh);
@@ -528,7 +550,7 @@ const AddProductLabelsInfo = async () => {
         // dialogTableVisible.value = false;
       }
     } else {
-      console.log("请选择标签");
+      ElMessage.error("请选择标签");
     }
   });
 };

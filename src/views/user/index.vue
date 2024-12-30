@@ -48,8 +48,8 @@
         <el-table-column prop="phone" label="电话" />
       </el-table>
 
-      <div class="fenye">
-        <!-- 分页组件 -->
+      <!-- 分页组件 -->
+      <!-- <div class="fenye">
         <el-pagination
           v-model:current-page="pagination.page"
           :page-size="pagination.pageSize"
@@ -57,7 +57,7 @@
           layout="prev, pager, next, total"
           @current-change="handlePageChange"
         />
-      </div>
+      </div> -->
     </div>
   </div>
 </template>

@@ -1,7 +1,7 @@
 <!-- src/components/Login.vue -->
 <template>
   <div class="login-container">
-    <h2 class="login-title">登錄</h2>
+    <h2 class="login-title">登录</h2>
     <el-form
       :model="loginForm"
       ref="loginFormRef"
@@ -9,26 +9,25 @@
       class="demo-loginForm"
       label-position="top"
     >
-      <el-form-item label="用戶名" prop="manager_name ">
+      <el-form-item label="用户名" prop="username ">
         <el-input
-          v-model.trim="loginForm.manager_name"
-          placeholder="請輸入用戶名"
+          v-model.trim="loginForm.username"
+          placeholder="请输入用户名"
         ></el-input>
       </el-form-item>
-      <el-form-item label="密碼" prop="password">
+      <el-form-item label="密码" prop="password">
         <el-input
           v-model.trim="loginForm.password"
           type="password"
-          placeholder="請輸入密碼"
+          placeholder="请输入密码"
         ></el-input>
       </el-form-item>
       <el-form-item>
         <el-button
           class="SaveCommit"
-          type="primary"
           @click="handleLogin"
           v-loading.fullscreen.lock="fullscreenLoading"
-          >登錄</el-button
+          >登录</el-button
         >
       </el-form-item>
     </el-form>
@@ -42,67 +41,62 @@ import router from "@/router";
 // import { Login } from "@/api/login";
 import CryptoJS from "crypto-js";
 import useHomeStore from "@/store/modules/home";
+import { login } from "@/api/login";
 
 interface LoginForm {
-  manager_name: string;
+  username: string;
   password: string;
 }
 const fullscreenLoading = ref(false);
 const loginForm = ref<LoginForm>({
-  manager_name: "",
+  username: "",
   password: "",
 });
 
 const rules = ref({
-  manager_name: [
-    { required: true, message: "請輸入用戶名", trigger: "change" },
-  ],
+  username: [{ required: true, message: "請輸入用戶名", trigger: "change" }],
   password: [{ required: true, message: "請輸入密碼", trigger: "change" }],
 });
 
 const loginFormRef = ref();
 
 const handleLogin = () => {
-  const key = CryptoJS.enc.Utf8.parse("jamescnm12345678");
-  const s1 = CryptoJS.enc.Utf8.parse(loginForm.value.password);
-  const s1Data = CryptoJS.AES.encrypt(s1, key, {
-    mode: CryptoJS.mode.ECB,
-    padding: CryptoJS.pad.ZeroPadding,
-  });
-  const loginFormBase64 = CryptoJS.enc.Base64.stringify(s1Data.ciphertext);
+  // const key = CryptoJS.enc.Utf8.parse("jamescnm12345678");
+  // const s1 = CryptoJS.enc.Utf8.parse(loginForm.value.password);
+  // const s1Data = CryptoJS.AES.encrypt(s1, key, {
+  //   mode: CryptoJS.mode.ECB,
+  //   padding: CryptoJS.pad.ZeroPadding,
+  // });
+  // const loginFormBase64 = CryptoJS.enc.Base64.stringify(s1Data.ciphertext);
   // loginForm.value.password = CryptoJS.enc.Base64.stringify(s1Data.ciphertext)
   loginFormRef.value.validate(async (valid: boolean) => {
     try {
       fullscreenLoading.value = true;
       if (valid) {
         // 在此处处理登录逻辑，例如发送请求到服务器进行验证
-        // const res = await Login({
-        //   manager_name: loginForm.value.manager_name,
-        //   password: loginFormBase64,
-        // });
-        // console.log("res", res.data.json.token);
-
-        // if (res.data.code === 0) {
-        //   ElMessage.success("登錄成功");
-        //   const storedToken = localStorage.getItem("token");
-        //   if (storedToken) {
-        //     localStorage.removeItem("token");
-        //   }
-
-        //   // useHomeStore().setToken(res.data.json.token)
-
-        //   localStorage.setItem("token", res.data.json.token);
-
-        //   router.push({ path: "/" });
-        // } else {
-        //   ElMessage.error("登錄失敗");
-        // }
+        const res = await login({
+          username: loginForm.value.username,
+          password: loginForm.value.password,
+        });
+        console.log("res", res.data);
+        if (res.data.code === 0) {
+          ElMessage.success("登录成功");
+          const storedToken = localStorage.getItem("token");
+          if (storedToken) {
+            localStorage.removeItem("token");
+          }
+          // useHomeStore().setToken(res.data.data.token)
+          localStorage.setItem("token", res.data.data.token);
+          router.push({ path: "/" });
+        } else {
+          ElMessage.error("登录失败");
+        }
       } else {
-        ElMessage.error("請填寫正確的表單信息");
+        ElMessage.error("请检查输入项是否正确");
       }
     } catch (err) {
       console.log(err);
-      ElMessage.error("登錄失敗");
+      ElMessage.error("登录失败");
     } finally {
       fullscreenLoading.value = false;
     }
@@ -117,7 +111,7 @@ const handleLogin = () => {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: #d7e2f5;
+  width: 100%;
 }
 
 .login-title {
@@ -141,7 +135,6 @@ const handleLogin = () => {
 }
 
 :deep(.el-form-item__label) {
-  color: #404b7c;
   font-family: Poppins;
   font-size: 20px;
   font-style: normal;
@@ -174,15 +167,14 @@ const handleLogin = () => {
 
 .SaveCommit {
   border-radius: 4px;
-  background: #005efe;
   box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.08);
   width: 100%;
   height: 54px;
-  color: #fff;
+  color: #000;
   font-family: Poppins;
-  font-size: 18px;
+  font-size: 20px;
   font-style: normal;
-  font-weight: 500;
+
   line-height: normal;
   margin-top: 20px;
 }

@@ -11,13 +11,16 @@
           label-width="auto"
           style="max-width: 100%"
         >
-          <el-form-item label="开始日期" style="width: 240px">
+          <el-form-item
+            label="开始日期"
+            :style="{ width: width > 616 ? ' 510px' : '240px' }"
+          >
             <el-date-picker
+              :teleported="false"
               v-model="dateRange"
               type="datetimerange"
-              range-separator="To"
-              start-placeholder="Start date"
-              end-placeholder="End date"
+              start-placeholder="Start "
+              end-placeholder="End "
               @change="handleDateChange"
             />
           </el-form-item>
@@ -151,8 +154,8 @@
         </el-table-column>
       </el-table>
 
-      <div class="fenye">
-        <!-- 分页组件 -->
+      <!-- 分页组件 -->
+      <!-- <div class="fenye">
         <el-pagination
           v-model:current-page="pagination.page"
           :page-size="pagination.pageSize"
@@ -160,7 +163,7 @@
           layout="prev, pager, next, total"
           @current-change="handlePageChange"
         />
-      </div>
+      </div> -->
     </div>
     <el-dialog
       v-model="RefundOperation"
@@ -238,7 +241,8 @@ import {
 
 import { ElMessage } from "element-plus";
 import { computed, onMounted, ref, watch } from "vue";
-
+import { useWindowSize } from "@/utils/useWindowSize";
+const { width } = useWindowSize();
 const loading = ref(false);
 // const storedToken = localStorage.getItem("token");
 // if (!storedToken) {
@@ -361,6 +365,7 @@ const ResetgetInfo = () => {
     time_duration: [],
     user_id: "",
   };
+  dateRange.value = null;
   pagination.value.page = 1;
   tableData.value = [];
   // getInfo();
@@ -507,6 +512,10 @@ onMounted(() => {
 .fenye {
   display: flex;
   justify-content: center;
+}
+:deep(.el-picker-panel__footer) {
+  display: flex;
+  text-align: left !important;
 }
 </style>
         

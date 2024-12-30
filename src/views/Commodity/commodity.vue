@@ -150,8 +150,8 @@
         </el-table-column>
       </el-table>
 
+      <!-- 分页组件 -->
       <div class="fenye">
-        <!-- 分页组件 -->
         <el-pagination
           v-model:current-page="pagination.page"
           :page-size="pagination.pageSize"
@@ -163,7 +163,13 @@
     </div>
 
     <el-dialog v-model="dialogTableVisible1" title="修改商品">
-      <el-form :model="UpdateForm" label-width="auto" style="max-width: 600px">
+      <el-form
+        :model="UpdateForm"
+        ref="UpdateFormRef"
+        label-width="auto"
+        style="max-width: 600px"
+        :rules="UpdateFormrules"
+      >
         <el-form-item label="商品描述" prop="description">
           <el-input clearable v-model.trim="UpdateForm.description" />
         </el-form-item>
@@ -187,7 +193,7 @@
             style="width: 100%"
           >
             <el-option
-              v-for="item in options"
+              v-for="item in optionsNum"
               :key="item.value"
               :label="item.label"
               :value="item.value"
@@ -308,6 +314,10 @@ const options = [
   { label: "上架", value: "1" },
   { label: "下架", value: "0" },
 ];
+const optionsNum = [
+  { label: "上架", value: 1 },
+  { label: "下架", value: 0 },
+];
 const options1 = [
   { label: "库存充足", value: "1" },
   { label: "库存不足", value: "0" },
@@ -340,7 +350,8 @@ const getInfo = async () => {
         }
       });
 
-      // pagination.value.total = res.data.data.page_size; //
+      pagination.value.total = res.data.data.page_size;
+      pagination.value.pageSize = res.data.data.page_size;
     } else {
       ElMessage.error(res.data.data.message_zh);
     }
@@ -417,23 +428,50 @@ const updateInfoclick = (row: any) => {
   dialogTableVisible1.value = true;
 };
 const UpdateFormRef = ref();
+const UpdateFormrules = ref({
+  description: [
+    { required: true, message: "商品描述不能为空", trigger: "change" },
+  ],
+  name: [{ required: true, message: "商品名不能为空", trigger: "change" }],
+  name_en: [
+    { required: true, message: "英文商品名不能为空", trigger: "change" },
+  ],
+  name_pin_yin: [
+    { required: true, message: "拼音商品名不能为空", trigger: "change" },
+  ],
+  price: [{ required: true, message: "基础价格不能为空", trigger: "change" }],
+  status: [
+    { required: true, message: "状态不能为空", trigger: "change" },
+    { type: "number", message: "状态只能输入数字", trigger: "change" },
+  ],
+  stock: [
+    { required: true, message: "基础库存不能为空", trigger: "change" },
+    { type: "number", message: "库存只能输入数字", trigger: "change" },
+  ],
+});
 const UpdateInfo = async () => {
-  try {
-    const res = await updateProduct(UpdateForm.value);
-    if (res.data.code === 0) {
-      ElMessage.success("修改成功");
-      // 清空表单并重置验证状态
-      // UpdateFormRef.value.resetFields();
-      dialogTableVisible1.value = false;
-      getInfo();
+  UpdateFormRef.value.validate(async (valid: boolean) => {
+    if (valid) {
+      try {
+        const res = await updateProduct(UpdateForm.value);
+        if (res.data.code === 0) {
+          ElMessage.success("修改成功");
+          // 清空表单并重置验证状态
+          UpdateFormRef.value.resetFields();
+          dialogTableVisible1.value = false;
+          getInfo();
+        } else {
+          ElMessage.error(res.data.data.message_zh);
+        }
+      } catch {
+        ElMessage.error("请求失败");
+      } finally {
+        // dialogTableVisible1.value = false;
+      }
     } else {
-      ElMessage.error(res.data.data.message_zh);
+      console.log("验证失败");
     }
-  } catch {
-    ElMessage.error("请求失败");
-  } finally {
-    // dialogTableVisible1.value = false;
-  }
+  });
 };
 
 const AddSpecificationsVisible = ref(false);

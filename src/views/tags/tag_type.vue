@@ -31,7 +31,7 @@
       <el-table :data="tableData" style="max-width: 100%" v-loading="loading">
         <el-table-column prop="category_name" label="所属类别名" />
         <el-table-column prop="name" label="标签类型名称" />
-     
+
         <!-- <el-table-column prop="product_spec_id" label="商品规格id" />
         <el-table-column prop="tag_id" label="标签id" /> -->
         <el-table-column label="操作">
@@ -49,8 +49,8 @@
         </el-table-column>
       </el-table>
 
-      <div class="fenye">
-        <!-- 分页组件 -->
+      <!-- 分页组件 -->
+      <!-- <div class="fenye">
         <el-pagination
           v-model:current-page="pagination.page"
           :page-size="pagination.pageSize"
@@ -58,10 +58,10 @@
           layout="prev, pager, next, total"
           @current-change="handlePageChange"
         />
-      </div>
+      </div> -->
     </div>
 
-    <el-dialog v-model="dialogTableVisible1" title="标签类型">
+    <el-dialog v-model="dialogTableVisible1" title="修改标签类型">
       <el-form :model="updateForm" label-width="auto" style="max-width: 600px">
         <!-- <el-form-item label="所属类别ID" prop="category_id">
           <el-input clearable v-model.trim.number="updateForm.category_id" />
@@ -69,7 +69,7 @@
         <el-form-item label="标签类型名称" prop="name">
           <el-input clearable v-model.trim="updateForm.name" />
         </el-form-item>
-  
+
         <!-- <el-form-item label="标签类型ID" prop="tag_type_id">
           <el-input clearable v-model.trim="updateForm.tag_type_id" />
         </el-form-item> -->
@@ -94,15 +94,15 @@
         :rules="tagsrules"
         ref="tagsFormRef"
       >
-        <el-form-item label="标签名称" prop="name">
-          <el-input clearable v-model.trim="tagsForm.name" />
-        </el-form-item>
         <el-form-item label="标签所属类型ID" prop="tag_type_id">
           <el-input
             clearable
             v-model.trim.number="tagsForm.tag_type_id"
             disabled
           />
+        </el-form-item>
+        <el-form-item label="标签名称" prop="name">
+          <el-input clearable v-model.trim="tagsForm.name" />
         </el-form-item>
 
         <el-form-item class="footer">
@@ -205,6 +205,10 @@ const updateInfoclick = (row: any) => {
   dialogTableVisible1.value = true;
 };
 const updateInfo = async () => {
+  if (updateForm.value.name.trim() === "") {
+    ElMessage.error("标签类型名称不能为空");
+    return;
+  }
   try {
     const res = await updateTagType(updateForm.value);
     if (res.data.code === 0) {

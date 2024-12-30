@@ -11,15 +11,6 @@
           label-width="auto"
           style="max-width: 100%"
         >
-          <el-form-item label="类型层级 : ">
-            <div class="Landscape">
-              <el-input
-                style="width: 175px"
-                clearable
-                v-model.trim.number="CategoriesForm.level"
-              />
-            </div>
-          </el-form-item>
           <el-form-item label="类型名 : ">
             <div class="Landscape">
               <el-input
@@ -47,7 +38,7 @@
               />
             </div>
           </el-form-item>
-          <el-form-item label="显示父级类名 : ">
+          <el-form-item label="父级类名 : ">
             <div class="Landscape">
               <el-input
                 style="width: 175px"
@@ -56,13 +47,25 @@
               />
             </div>
           </el-form-item>
-
+          <el-form-item label="类型层级 : ">
+            <div class="Landscape">
+              <el-input
+                style="width: 175px"
+                clearable
+                v-model.trim.number="CategoriesForm.level"
+              />
+            </div>
+          </el-form-item>
           <el-form-item>
-            <el-button size="small" plain @click="getInfo()">查詢</el-button>
-            <el-button size="small" plain @click="ResetgetInfo()"
-              >重置</el-button
-            >
-            <el-button size="small" plain @click="Addclick">添加商品</el-button>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px">
+              <el-button size="small" plain @click="getInfo()">查詢</el-button>
+              <el-button size="small" plain @click="ResetgetInfo()"
+                >重置</el-button
+              >
+              <el-button size="small" plain @click="Addclick"
+                >添加商品</el-button
+              >
+            </div>
           </el-form-item>
         </el-form>
       </div>
@@ -151,8 +154,8 @@
         </el-table-column>
       </el-table>
 
+      <!-- 分页组件 -->
       <div class="fenye">
-        <!-- 分页组件 -->
         <el-pagination
           v-model:current-page="pagination.page"
           :page-size="pagination.pageSize"
@@ -330,7 +333,7 @@ const CategoriesForm = ref({
   name_en: "",
   name_pin_yin: "",
   page: 0,
-  parent_name: null,
+  parent_name: "",
   sort: null,
 });
 
@@ -346,6 +349,7 @@ const getInfo = async () => {
     loading.value = true;
     const res = await selectCategory({
       ...CategoriesForm.value,
+      level: CategoriesForm.value.level || null,
     });
     // page: pagination.value.page,
     // pageSize: pagination.value.pageSize,
@@ -356,7 +360,8 @@ const getInfo = async () => {
         return;
       }
       tableData.value = res.data.data.list; //
-      // pagination.value.total = res.data.data.page_size; //
+      pagination.value.total = res.data.data.page_size; //
+      pagination.value.pageSize = res.data.data.page_size; //
       tableData.value.forEach((item: any) => {
         if (item.image_urls !== "") {
           item.image_urls = JSON.parse(item.image_urls)[0];
@@ -380,7 +385,7 @@ const ResetgetInfo = () => {
     name_en: "",
     name_pin_yin: "",
     page: 0,
-    parent_name: null,
+    parent_name: "",
     sort: null,
   };
   pagination.value.page = 1;
@@ -753,5 +758,8 @@ onMounted(() => {
   align-items: start;
   justify-content: center;
   flex-wrap: wrap;
+}
+:deep(.el-button + .el-button) {
+  margin-left: 0;
 }
 </style>
