@@ -32,7 +32,7 @@
 
 
 <script lang="ts" setup name="CommonAside">
-import { defineProps } from "vue";
+
 
 // 引入 data 数据，假设 data 是路由配置
 import data from "@/router/data";

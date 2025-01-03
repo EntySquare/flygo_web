@@ -43,7 +43,14 @@ let router = createRouter({
 // 在路由切换前显示进度条
 router.beforeEach((to, from, next) => {
   NProgress.start(); //进度条开始
-  next();
+  const token = localStorage.getItem('token'); // 获取本地存储中的 token
+
+  // 如果没有 token 且目标路由不是登录页，则跳转到登录页
+  if (!token && to.path !== '/login') {
+    next('/login');
+  } else {
+    next(); // 继续导航
+  }
 });
 
 // 在路由切换后结束进度条
