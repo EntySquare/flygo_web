@@ -153,13 +153,16 @@
       </div>
     </div>
 
-    <el-dialog v-model="dialogTableVisible1" title="修改规格">
+    <el-dialog
+      v-model="dialogTableVisible1"
+      title="修改规格"
+      style="max-width: 600px"
+    >
       <el-form
         ref="updateFormRef"
         :model="updateForm"
         label-width="auto"
         :rules="rules"
-        style="max-width: 600px"
       >
         <el-form-item label="价格" prop="price">
           <el-input clearable v-model.trim="updateForm.price" />
@@ -207,11 +210,11 @@
       title="修改商品标签"
       @close="resetSelectedTags"
       @cancel="resetSelectedTags"
+      style="max-width: 600px"
     >
       <el-form
         :model="AddProductLabelsForm"
         label-width="auto"
-        style="max-width: 600px"
         ref="AddProductLabelsFormRef"
       >
         <el-form-item label="商品规格名" prop="product_spec_name">
@@ -494,11 +497,12 @@ const AddProductLabels = async (row: any) => {
       ProductLabelsList.value = null;
       return;
     }
+    console.log("res.data.data", res.data.data);
+
     if (res.data.data.list !== null || res.data.data.list.length > 0) {
       ProductLabelsList.value = res.data.data.list;
-      if (res.data.data.list.tags) {
-        setDefaultSelectedTags(); // 打开弹窗时设置默认选中的标签
-      }
+      console.log("res.data.data.list.tags", res.data.data.list.tags);
+      setDefaultSelectedTags(); // 打开弹窗时设置默认选中的标签
     }
   } else {
     ElMessage.error(res.data.data.message_zh);
@@ -510,9 +514,18 @@ const selectedTags = ref<any>({});
 const setDefaultSelectedTags = () => {
   ProductLabelsList.value.forEach(
     (group: { tags: any[]; name: string | number }) => {
+      if (group.tags === null) {
+        return;
+      }
       group.tags.forEach((tag) => {
         if (tag.selected === 1) {
-          selectedTags.value[group.name] = tag.id;
+          console.log(
+            " selectedTags.value[group.name] = tag.id; // 设置默认选中的标签",
+            selectedTags.value[group.name],
+            tag.id
+          );
+
+          selectedTags.value[group.name] = tag.id; // 设置默认选中的标签
         }
       });
     }

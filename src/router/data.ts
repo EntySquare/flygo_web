@@ -23,11 +23,11 @@ const deta = [
         lable: '标签类型',
         path: '/tagType', component: () => import('@/views/tags/tag_type.vue')
     },
-    {
-        name: 'tags',
-        lable: '标签',
-        path: '/tags', component: () => import('@/views/tags/tags.vue')
-    },
+    // {
+    //     name: 'tags',
+    //     lable: '标签',
+    //     path: '/tags', component: () => import('@/views/tags/tags.vue')
+    // },
     {
         name: 'user',
         lable: '用户列表',

@@ -165,11 +165,14 @@
         />
       </div>
     </div>
-    <el-dialog v-model="dialogTableVisible" title="添加子类">
+    <el-dialog
+      v-model="dialogTableVisible"
+      title="添加子类"
+      style="max-width: 600px"
+    >
       <el-form
         :model="AddForm"
         label-width="auto"
-        style="max-width: 600px"
         :rules="rules"
         ref="AddFormRef"
       >
@@ -201,8 +204,12 @@
         </el-form-item>
       </el-form>
     </el-dialog>
-    <el-dialog v-model="dialogTableVisible1" title="修改类别">
-      <el-form :model="updateForm" label-width="auto" style="max-width: 600px">
+    <el-dialog
+      v-model="dialogTableVisible1"
+      title="修改类别"
+      style="max-width: 600px"
+    >
+      <el-form :model="updateForm" label-width="auto">
         <el-form-item label="类型名" prop="name">
           <el-input clearable v-model.trim="updateForm.name" />
         </el-form-item>
@@ -226,11 +233,14 @@
         </el-form-item>
       </el-form>
     </el-dialog>
-    <el-dialog v-model="CommodityVisible" title="添加商品">
+    <el-dialog
+      v-model="CommodityVisible"
+      title="添加商品"
+      style="max-width: 600px"
+    >
       <el-form
         :model="CommodityForm"
         label-width="auto"
-        style="max-width: 600px"
         :rules="Commodityrules"
         ref="CommodityFormRef"
       >
@@ -283,11 +293,14 @@
         </el-form-item>
       </el-form>
     </el-dialog>
-    <el-dialog v-model="tagTypeVisible" title="添加标签类型">
+    <el-dialog
+      v-model="tagTypeVisible"
+      title="添加标签类型"
+      style="max-width: 600px"
+    >
       <el-form
         :model="tagTypeForm"
         label-width="auto"
-        style="max-width: 600px"
         :rules="tagTyperules"
         ref="tagTypeFormRef"
       >

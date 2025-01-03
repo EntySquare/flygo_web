@@ -4,33 +4,8 @@
       <el-text class="mx-1" size="large">标签</el-text>
     </div>
     <div class="cont">
-      <div class="phone_input">
-        <el-form
-          label-position="left"
-          :inline="true"
-          label-width="auto"
-          style="max-width: 100%"
-        >
-          <el-form-item label="标签所属类型名 : ">
-            <div class="Landscape">
-              <el-input
-                style="width: 175px"
-                clearable
-                v-model.trim="form.tag_type_name"
-              />
-            </div>
-          </el-form-item>
-
-          <el-form-item>
-            <el-button size="small" plain @click="getInfo()">查詢</el-button>
-            <el-button size="small" plain @click="ResetgetInfo()"
-              >重置</el-button
-            >
-          </el-form-item>
-        </el-form>
-      </div>
       <el-table :data="tableData" style="width: 100%" v-loading="loading">
-        <el-table-column prop="tag_type_name" label="所属类别名" />
+        <el-table-column prop="tag_type_name" label="所属标签类型名" />
         <el-table-column prop="name" label="标签类型名称" />
         <el-table-column label="操作">
           <template #default="{ row }">
@@ -56,8 +31,12 @@
       </div> -->
     </div>
 
-    <el-dialog v-model="dialogTableVisible1" title="修改标签">
-      <el-form :model="updateForm" label-width="auto" style="max-width: 600px">
+    <el-dialog
+      v-model="dialogTableVisible1"
+      title="修改标签"
+      style="max-width: 600px"
+    >
+      <el-form :model="updateForm" label-width="auto">
         <el-form-item label="标签名称" prop="name">
           <el-input clearable v-model.trim="updateForm.name" />
         </el-form-item>
@@ -96,6 +75,10 @@ const loading = ref(false);
 // }
 const form = ref({
   tag_type_name: "",
+});
+
+const props = ref({
+  id: "",
 });
 
 const tableData = ref([]);
@@ -138,7 +121,7 @@ const ResetgetInfo = () => {
     tag_type_name: "",
   };
   pagination.value.page = 1;
-  
+
   getInfo();
 };
 

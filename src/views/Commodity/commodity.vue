@@ -162,12 +162,15 @@
       </div>
     </div>
 
-    <el-dialog v-model="dialogTableVisible1" title="修改商品">
+    <el-dialog
+      v-model="dialogTableVisible1"
+      title="修改商品"
+      style="max-width: 600px"
+    >
       <el-form
         :model="UpdateForm"
         ref="UpdateFormRef"
         label-width="auto"
-        style="max-width: 600px"
         :rules="UpdateFormrules"
       >
         <el-form-item label="商品描述" prop="description">
@@ -216,11 +219,10 @@
         </el-form-item>
       </el-form>
     </el-dialog>
-    <el-dialog v-model="AddSpecificationsVisible" title="添加规格">
+    <el-dialog v-model="AddSpecificationsVisible" title="添加规格"  style="max-width: 600px">
       <el-form
         :model="AddSpecificationsForm"
         label-width="auto"
-        style="max-width: 600px"
         :rules="AddSpecificationsrules"
         ref="AddSpecificationsFormRef"
       >

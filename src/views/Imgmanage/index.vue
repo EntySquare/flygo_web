@@ -87,10 +87,12 @@
         <el-table-column prop="image_urls" label="商品图片">
           <template #default="{ row }">
             <img
+              v-if="row.image_urls"
               style="width: 40px; height: auto"
               :src="JSON.parse(row.image_urls)"
               alt=""
             />
+            <el-text v-else>暂无图片</el-text>
           </template>
         </el-table-column>
         <el-table-column prop="name" label="商品名" />
@@ -199,10 +201,12 @@
         <el-table-column prop="image_urls" label="商品图片">
           <template #default="{ row }">
             <img
+              v-if="row.image_urls"
               style="width: 40px; height: auto"
               :src="JSON.parse(row.image_urls)"
               alt=""
             />
+            <el-text v-else>暂无图片</el-text>
           </template>
         </el-table-column>
         <el-table-column prop="name" label="商品名" />
@@ -243,10 +247,12 @@
         </el-form-item>
         <el-form-item label="商品图片 :" prop="image_urls">
           <img
+            v-if="HotItemsList.image_urls"
             style="width: 200px; height: 200px"
             :src="JSON.parse(HotItemsList.image_urls)"
             alt=""
           />
+          <el-text v-else>暂无图片</el-text>
         </el-form-item>
 
         <el-form-item label="商品名 :" prop="name">
@@ -292,10 +298,12 @@
         </el-form-item>
         <el-form-item label="商品图片 :" prop="image_urls">
           <img
+            v-if="todayProductList.image_urls"
             style="width: 200px; height: 200px"
             :src="JSON.parse(todayProductList.image_urls)"
             alt=""
           />
+          <el-text v-else>暂无图片</el-text>
         </el-form-item>
 
         <el-form-item label="商品名 :" prop="name">
