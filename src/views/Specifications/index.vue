@@ -98,6 +98,7 @@
                   flex-wrap: wrap;
                   gap: 4px;
                 "
+                @click="associated_id = row.id"
               >
                 <img
                   v-if="row.image_urls"
@@ -105,9 +106,7 @@
                   :src="row.image_urls"
                   alt=""
                 />
-                <el-button size="small" @click="associated_id = row.id"
-                  >上传</el-button
-                >
+                <el-button size="small">上传</el-button>
               </div>
             </el-upload>
           </template>
@@ -610,14 +609,29 @@ const handleBeforeUpload = async (file: File) => {
   return false; // 阻止默认上传行为，使用自定义上传方法
 };
 const loadingImg = ref(false);
-const associated_id = ref("");
+const associated_id = ref(0);
 // 文件上传函数
 const uploadFile = async (file: File, extension: string) => {
   loadingImg.value = true;
-  const formData = new FormData();
-  formData.append("file", file); // 把文件附加到 FormData 对象中
+  // const formData = new FormData();
+  // formData.append("file", file); // 把文件附加到 FormData 对象中
 
   try {
+    // 1. 提取文件后缀并重命名
+    const originalFileName = file.name;
+    const fileExtension = originalFileName.slice(
+      originalFileName.lastIndexOf(".")
+    ); // 获取文件后缀
+    const timestamp = Date.now();
+    const newFileName = `${timestamp}img${fileExtension}`; // 使用时间戳命名文件，保留后缀
+    // 2. 创建新的文件对象，保持原文件的其他属性
+    const renamedFile = new File([file], newFileName, {
+      type: file.type, // 原始 MIME 类型
+      lastModified: file.lastModified, // 保留原始 lastModified
+    });
+
+    const formData = new FormData();
+    formData.append("file", renamedFile);
     const response = await uploadImages(formData); // 上传文件 调用你提供的 uploadImages 方法
     console.log("response", response.data.data);
     if (response.data.code === 0) {
