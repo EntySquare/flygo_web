@@ -62,6 +62,9 @@
               <el-button size="small" plain @click="ResetgetInfo()"
                 >重置</el-button
               >
+              <el-button size="small" plain @click="Addclick"
+                >添加类别</el-button
+              >
             </div>
           </el-form-item>
         </el-form>
