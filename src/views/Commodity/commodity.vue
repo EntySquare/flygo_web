@@ -205,6 +205,9 @@
         <el-form-item label="基础库存" prop="stock">
           <el-input clearable v-model.trim.number="UpdateForm.stock" />
         </el-form-item>
+        <el-form-item label="积分" prop="point">
+          <el-input clearable v-model.trim.number="UpdateForm.point" />
+        </el-form-item>
         <el-form-item class="footer">
           <el-button
             plain
@@ -269,6 +272,12 @@
             v-model.trim.number="AddSpecificationsForm.stock"
           />
         </el-form-item>
+        <el-form-item label="积分" prop="point">
+          <el-input
+              clearable
+              v-model.trim.number="AddSpecificationsForm.point"
+          />
+        </el-form-item>
         <el-form-item class="footer">
           <el-button
             plain
@@ -314,6 +323,7 @@ const form = ref({
   status: "",
   // 基础库存 0-库存不足 1-库存充足
   stock: "",
+  point: 0, // 积分
 });
 const options = [
   { label: "上架", value: "1" },
@@ -414,6 +424,7 @@ const UpdateForm = ref({
   sort: "",
   status: "",
   stock: "",
+  point:0,
 });
 const updateInfoclick = (row: any) => {
   UpdateForm.value = {
@@ -427,6 +438,7 @@ const updateInfoclick = (row: any) => {
     sort: row.sort || null,
     status: row.status || null,
     stock: row.stock || null,
+    point: row.point || 0,
   };
   console.log("row", UpdateForm.value);
 
@@ -487,6 +499,7 @@ const AddSpecificationsForm = ref({
   spec_name_en: "",
   stock: null,
   status: null,
+  point:0,
 });
 const AddSpecificationsrules = ref({
   product_id: [

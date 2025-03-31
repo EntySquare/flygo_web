@@ -19,6 +19,18 @@ const deta = [
     },
 
     {
+        path: '/commodityTreasureHunt',
+        name: 'commodityTreasureHunt',
+        lable: '夺宝商品',
+        component: () => import('@/views/Commodity/commodityTreasureHunt.vue'),
+    },
+    {
+        name: 'treasureHuntSpec',
+        lable: '夺宝规格',
+        path: '/treasureHuntSpec',
+        component: () => import('@/views/Specifications/treasureHuntSpec.vue')
+    },
+    {
         name: 'tagType',
         lable: '标签类型',
         path: '/tagType', component: () => import('@/views/tags/tag_type.vue')

@@ -142,6 +142,13 @@
                 >添加商品</el-button
               >
               <el-button
+                  size="small"
+                  v-if="row.parent_id !== 0"
+                  plain
+                  @click="AddTreasureHuntCommodityclick(row)"
+              >添加夺宝商品</el-button
+              >
+              <el-button
                 size="small"
                 v-if="row.parent_id !== 0"
                 plain
@@ -251,16 +258,16 @@
           />
         </el-form-item>
         <el-form-item label="商品描述" prop="description">
-          <el-input clearable v-model.trim="CommodityForm.description" />
+          <el-input clearable v-model="CommodityForm.description" />
         </el-form-item>
         <el-form-item label="商品名" prop="name">
-          <el-input clearable v-model.trim="CommodityForm.name" />
+          <el-input clearable v-model="CommodityForm.name" />
         </el-form-item>
         <el-form-item label="英文商品名" prop="name_en">
-          <el-input clearable v-model.trim="CommodityForm.name_en" />
+          <el-input clearable v-model="CommodityForm.name_en" />
         </el-form-item>
         <el-form-item label="拼音商品名" prop="name_pin_yin">
-          <el-input clearable v-model.trim="CommodityForm.name_pin_yin" />
+          <el-input clearable v-model="CommodityForm.name_pin_yin" />
         </el-form-item>
         <el-form-item label="基础价格" prop="price">
           <el-input clearable v-model.trim="CommodityForm.price" />
@@ -288,6 +295,67 @@
           >
           <el-button plain style="width: 48%" @click="CommodityInfo()"
             >确认</el-button
+          >
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+
+    <el-dialog
+        v-model="TreasureHuntCommodityVisible"
+        title="添加夺宝商品"
+        style="max-width: 600px"
+    >
+      <el-form
+          :model="TreasureHuntCommodityForm"
+          label-width="auto"
+          :rules="Commodityrules"
+          ref="TreasureHuntCommodityFormRef"
+      >
+        <el-form-item label="类型ID" prop="category_id">
+          <el-input
+              clearable
+              v-model.trim.number="TreasureHuntCommodityForm.category_id"
+              disabled
+          />
+        </el-form-item>
+        <el-form-item label="商品描述" prop="description">
+          <el-input clearable v-model="TreasureHuntCommodityForm.description" />
+        </el-form-item>
+        <el-form-item label="商品名" prop="name">
+          <el-input clearable v-model="TreasureHuntCommodityForm.name" />
+        </el-form-item>
+        <el-form-item label="英文商品名" prop="name_en">
+          <el-input clearable v-model="TreasureHuntCommodityForm.name_en" />
+        </el-form-item>
+        <el-form-item label="拼音商品名" prop="name_pin_yin">
+          <el-input clearable v-model="TreasureHuntCommodityForm.name_pin_yin" />
+        </el-form-item>
+        <el-form-item label="基础价格" prop="price">
+          <el-input clearable v-model="TreasureHuntCommodityForm.price" />
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-select
+              v-model="TreasureHuntCommodityForm.status"
+              placeholder="Select"
+              style="width: 100%"
+          >
+            <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="基础库存" prop="stock">
+          <el-input clearable v-model.trim.number="TreasureHuntCommodityForm.stock" />
+        </el-form-item>
+        <el-form-item class="footer">
+          <el-button plain style="width: 48%" @click="TreasureHuntCommodityVisible = false"
+          >取消</el-button
+          >
+          <el-button plain style="width: 48%" @click="TreasureHuntCommodityInfo()"
+          >确认</el-button
           >
         </el-form-item>
       </el-form>
@@ -330,6 +398,7 @@ import { selectCategory } from "@/api/Querying";
 import { updateCategory } from "@/api/update";
 import { ElMessage } from "element-plus";
 import { onMounted, ref } from "vue";
+import {addTreasureHuntProduct} from "@/api/treasureHunt";
 
 const loading = ref(false);
 
@@ -541,6 +610,17 @@ const CommodityForm = ref({
   status: null,
   stock: null,
 });
+const TreasureHuntCommodityVisible = ref(false);
+const TreasureHuntCommodityForm = ref({
+  category_id: null,
+  description: "",
+  name: "",
+  name_en: "",
+  name_pin_yin: "",
+  price: null,
+  status: null,
+  stock: null,
+});
 const Commodityrules = ref({
   category_id: [
     { required: true, message: "类型ID不能为空", trigger: "change" },
@@ -564,7 +644,14 @@ const AddCommodityclick = (row: any) => {
   CommodityForm.value.category_id = row.id;
   CommodityVisible.value = true;
 };
+
+const AddTreasureHuntCommodityclick = (row: any) => {
+  TreasureHuntCommodityForm.value.category_id = row.id;
+  TreasureHuntCommodityVisible.value = true;
+};
 const CommodityFormRef = ref();
+const TreasureHuntCommodityFormRef = ref();
+
 const CommodityInfo = async () => {
   CommodityFormRef.value.validate(async (valid: boolean) => {
     if (valid) {
@@ -591,7 +678,32 @@ const CommodityInfo = async () => {
     }
   });
 };
+const TreasureHuntCommodityInfo = async () => {
+  TreasureHuntCommodityFormRef.value.validate(async (valid: boolean) => {
+    if (valid) {
+      try {
+        const res = await addTreasureHuntProduct(TreasureHuntCommodityForm.value);
+        console.log("res.data.code", res.data.code);
 
+        if (res.data.code === 0) {
+          ElMessage.success("添加成功");
+          //   // 清空表单并重置验证状态
+          TreasureHuntCommodityFormRef.value.resetFields();
+          TreasureHuntCommodityVisible.value = false;
+          getInfo();
+        } else {
+          ElMessage.error(res.data.data.message_zh);
+        }
+      } catch {
+        ElMessage.error("请求失败");
+      } finally {
+        // dialogTableVisible.value = false;
+      }
+    } else {
+      console.log("验证失败");
+    }
+  });
+};
 // ! 添加标签类型
 const tagTypeVisible = ref(false);
 const tagTypeForm = ref({

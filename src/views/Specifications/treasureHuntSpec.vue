@@ -2,7 +2,7 @@
   <!-- 规格 -->
   <div class="home_view">
     <div style="margin-bottom: 14px">
-      <el-text class="mx-1" size="large">规格</el-text>
+      <el-text class="mx-1" size="large">夺宝商品规格</el-text>
     </div>
     <div class="cont" v-loading="loadingImg">
       <div class="phone_input">
@@ -123,7 +123,6 @@
             {{ row.stock === 0 ? "库存不足" : "库存充足" }}
           </template>
         </el-table-column>
-        <el-table-column prop="point" label="积分" />
 
         <el-table-column label="操作">
           <template #default="{ row }">
@@ -192,9 +191,6 @@
         </el-form-item>
         <el-form-item label="库存" prop="stock">
           <el-input clearable v-model.trim.number="updateForm.stock" />
-        </el-form-item>
-        <el-form-item label="积分" prop="point">
-          <el-input clearable v-model.trim.number="updateForm.point" />
         </el-form-item>
         <el-form-item class="footer">
           <el-button
@@ -316,11 +312,8 @@
 </template>
   
   <script lang="ts" setup>
-import { addProductTag, addSpec } from "@/api/add";
-import { deleteSpec } from "@/api/delete";
-import { getAvailableTag, selectSpec } from "@/api/Querying";
+  import { deleteSpec ,getAvailableTag, selectSpec, updateProductTag, updateSpec} from "@/api/treasureHunt";
 import { setImageUrls, uploadImages } from "@/api/img";
-import { updateProductTag, updateSpec } from "@/api/update";
 import { ElMessage } from "element-plus";
 import { onMounted, ref } from "vue";
 
@@ -339,7 +332,6 @@ const form = ref({
   status: null,
   // 基础库存 0-库存不足 1-库存充足
   stock: null,
-  point:0,
 });
 const options = [
   { label: "上架", value: 1 },
@@ -431,7 +423,6 @@ const updateForm = ref({
   spec_name_en: null,
   stock: null,
   status: "",
-  point:0,
 });
 const updateInfoclick = (row: any) => {
   updateForm.value = {
@@ -442,7 +433,6 @@ const updateInfoclick = (row: any) => {
     spec_name_en: row.spec_name_en || "",
     stock: row.stock || null,
     status: row.status,
-    point:row.point||0,
   };
   dialogTableVisible1.value = true;
 };

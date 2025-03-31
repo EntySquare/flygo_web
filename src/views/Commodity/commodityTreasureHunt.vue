@@ -1,8 +1,7 @@
 <template>
-  <!-- 规格 -->
   <div class="home_view">
     <div style="margin-bottom: 14px">
-      <el-text class="mx-1" size="large">规格</el-text>
+      <el-text class="mx-1" size="large">夺宝商品</el-text>
     </div>
     <div class="cont" v-loading="loadingImg">
       <div class="phone_input">
@@ -12,25 +11,33 @@
           label-width="auto"
           style="max-width: 100%"
         >
-          <el-form-item label="规格名 : ">
+          <el-form-item label="商品名 : ">
             <div class="Landscape">
               <el-input
                 style="width: 175px"
                 clearable
-                v-model.trim="form.spec_name"
+                v-model.trim="form.name"
               />
             </div>
           </el-form-item>
-          <el-form-item label="英文规格名 : ">
+          <el-form-item label="英文商品名 : ">
             <div class="Landscape">
               <el-input
                 style="width: 175px"
                 clearable
-                v-model.trim="form.spec_name_en"
+                v-model.trim="form.name_en"
               />
             </div>
           </el-form-item>
-
+          <el-form-item label="拼音商品名 : ">
+            <div class="Landscape">
+              <el-input
+                style="width: 175px"
+                clearable
+                v-model.trim="form.name_pin_yin"
+              />
+            </div>
+          </el-form-item>
           <el-form-item label="状态 : ">
             <div class="Landscape">
               <el-select
@@ -47,7 +54,7 @@
               </el-select>
             </div>
           </el-form-item>
-          <el-form-item label="库存 : ">
+          <el-form-item label="基础库存 : ">
             <div class="Landscape">
               <el-select
                 v-model="form.stock"
@@ -73,10 +80,9 @@
         </el-form>
       </div>
       <el-table :data="tableData" style="width: 100%" v-loading="loading">
-        <el-table-column prop="product_name" label="商品名" />
-        <el-table-column prop="spec_name" label="规格名" />
-        <el-table-column prop="spec_name_en" label="英文规格名" />
-        <el-table-column prop="image_urls" label="规格图片">
+        <el-table-column prop="category_name" label="类型名" />
+        <el-table-column prop="description" label="商品描述" />
+        <el-table-column prop="image_urls" label="商品图片">
           <template #default="{ row }">
             <!-- {{ row.image_urls }} -->
 
@@ -94,9 +100,9 @@
               <div
                 style="
                   display: flex;
-                  flex-direction: column;
                   flex-wrap: wrap;
                   gap: 4px;
+                  flex-direction: column;
                 "
                 @click="associated_id = row.id"
               >
@@ -106,13 +112,16 @@
                   :src="row.image_urls"
                   alt=""
                 />
+
                 <el-button size="small">上传</el-button>
               </div>
             </el-upload>
           </template>
         </el-table-column>
-        <el-table-column prop="price" label="价格" />
-
+        <el-table-column prop="name" label="商品名" />
+        <el-table-column prop="name_en" label="英文商品名" />
+        <el-table-column prop="name_pin_yin" label="拼音商品名" />
+        <el-table-column prop="price" label="基础价格" />
         <el-table-column prop="status" label="状态">
           <template #default="{ row }">{{
             row.status === 0 ? "下架" : "上架"
@@ -123,8 +132,6 @@
             {{ row.stock === 0 ? "库存不足" : "库存充足" }}
           </template>
         </el-table-column>
-        <el-table-column prop="point" label="积分" />
-
         <el-table-column label="操作">
           <template #default="{ row }">
             <div style="display: flex; flex-wrap: wrap; gap: 4px">
@@ -134,8 +141,8 @@
               <el-button size="small" plain @click="updateInfoclick(row)"
                 >修改</el-button
               >
-              <el-button size="small" plain @click="AddProductLabels(row)"
-                >修改商品标签</el-button
+              <el-button size="small" plain @click="AddSpecificationsClick(row)"
+                >添加规格</el-button
               >
             </div>
           </template>
@@ -156,29 +163,95 @@
 
     <el-dialog
       v-model="dialogTableVisible1"
-      title="修改规格"
+      title="修改商品"
       style="max-width: 600px"
     >
       <el-form
-        ref="updateFormRef"
-        :model="updateForm"
+        :model="UpdateForm"
+        ref="UpdateFormRef"
         label-width="auto"
-        :rules="rules"
+        :rules="UpdateFormrules"
       >
-        <el-form-item label="价格" prop="price">
-          <el-input clearable v-model.trim="updateForm.price" />
+        <el-form-item label="商品描述" prop="description">
+          <el-input clearable v-model.trim="UpdateForm.description" />
+        </el-form-item>
+        <el-form-item label="商品名" prop="name">
+          <el-input clearable v-model.trim="UpdateForm.name" />
+        </el-form-item>
+        <el-form-item label="英文商品名" prop="name_en">
+          <el-input clearable v-model.trim="UpdateForm.name_en" />
+        </el-form-item>
+        <el-form-item label="拼音商品名" prop="name_pin_yin">
+          <el-input clearable v-model.trim="UpdateForm.name_pin_yin" />
+        </el-form-item>
+        <el-form-item label="基础价格" prop="price">
+          <el-input clearable v-model.trim="UpdateForm.price" />
         </el-form-item>
 
+        <el-form-item label="状态" prop="status">
+          <el-select
+            v-model.number="UpdateForm.status"
+            placeholder="Select"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="item in optionsNum"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="基础库存" prop="stock">
+          <el-input clearable v-model.trim.number="UpdateForm.stock" />
+        </el-form-item>
+        <el-form-item class="footer">
+          <el-button
+            plain
+            style="width: 48%"
+            @click="dialogTableVisible1 = false"
+            >取消</el-button
+          >
+          <el-button plain style="width: 48%" @click="UpdateInfo()"
+            >确认</el-button
+          >
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+    <el-dialog
+      v-model="AddSpecificationsVisible"
+      title="添加规格"
+      style="max-width: 600px"
+    >
+      <el-form
+        :model="AddSpecificationsForm"
+        label-width="auto"
+        :rules="AddSpecificationsrules"
+        ref="AddSpecificationsFormRef"
+      >
+        <el-form-item label="商品规格ID" prop="product_id">
+          <el-input
+            clearable
+            disabled
+            v-model.trim.number="AddSpecificationsForm.product_id"
+          />
+        </el-form-item>
+        <el-form-item label="价格" prop="price">
+          <el-input clearable v-model.trim="AddSpecificationsForm.price" />
+        </el-form-item>
         <el-form-item label="规格名" prop="spec_name">
-          <el-input clearable v-model.trim="updateForm.spec_name" />
+          <el-input clearable v-model.trim="AddSpecificationsForm.spec_name" />
         </el-form-item>
         <el-form-item label="英文规格名" prop="spec_name_en">
-          <el-input clearable v-model.trim="updateForm.spec_name_en" />
+          <el-input
+            clearable
+            v-model.trim="AddSpecificationsForm.spec_name_en"
+          />
         </el-form-item>
 
         <el-form-item label="状态 : " prop="status">
           <el-select
-            v-model="updateForm.status"
+            v-model="AddSpecificationsForm.status"
             placeholder="Select"
             style="width: 100%"
           >
@@ -191,163 +264,65 @@
           </el-select>
         </el-form-item>
         <el-form-item label="库存" prop="stock">
-          <el-input clearable v-model.trim.number="updateForm.stock" />
-        </el-form-item>
-        <el-form-item label="积分" prop="point">
-          <el-input clearable v-model.trim.number="updateForm.point" />
+          <el-input
+            clearable
+            v-model.trim.number="AddSpecificationsForm.stock"
+          />
         </el-form-item>
         <el-form-item class="footer">
           <el-button
             plain
             style="width: 48%"
-            @click="dialogTableVisible1 = false"
+            @click="AddSpecificationsVisible = false"
             >取消</el-button
           >
-          <el-button plain style="width: 48%" @click="updateInfo()"
+          <el-button plain style="width: 48%" @click="AddSpecificationsInfo()"
             >确认</el-button
-          >
-        </el-form-item>
-      </el-form>
-    </el-dialog>
-    <el-dialog
-      v-model="AddProductLabelsVisible"
-      title="修改商品标签"
-      @close="resetSelectedTags"
-      @cancel="resetSelectedTags"
-      style="max-width: 600px"
-    >
-      <el-form
-        :model="AddProductLabelsForm"
-        label-width="auto"
-        ref="AddProductLabelsFormRef"
-      >
-        <el-form-item label="商品规格名" prop="product_spec_name">
-          <el-input
-            clearable
-            disabled
-            v-model.trim="uploadProductForm.product_spec_name"
-          />
-        </el-form-item>
-
-        <div
-          v-if="ProductLabelsList === null"
-          style="text-align: center; margin-top: 20px"
-        >
-          暂无商品标签可修改
-        </div>
-        <!-- <el-form-item label="标签"></el-form-item> -->
-        <div v-else>
-          <el-text class="mx-1" size="large">标签</el-text>
-          <div style="height: 10px"></div>
-          <!-- <el-form-item
-            label=""
-            prop="tag_name"
-            v-for="(item, index) in ProductLabelsList"
-            :key="index"
-          >
-            <el-text class="mx-1" size="" style="margin: 0 10px">{{
-              item.name
-            }}</el-text>
-            {{ item.tags.name }}
-            <el-select
-              v-model="item.tags.name"
-              placeholder="输入商品标签"
-              style="width: 100%"
-            >
-              <el-option
-                v-for="i in item.tags"
-                :key="i.id"
-                :label="i.name"
-                :value="i.name"
-              />
-            </el-select>
-          </el-form-item> -->
-          <div v-for="(group, index) in ProductLabelsList" :key="index">
-            <el-select
-              v-model="selectedTags[group.name]"
-              :placeholder="`选择${group.name}`"
-              style="width: 100%"
-              @change="handleTagChange(group.name, $event)"
-            >
-              <!-- 渲染标签项 -->
-              <el-option
-                v-for="tag in group.tags"
-                :key="tag.id"
-                :label="tag.name"
-                :value="tag.id"
-              />
-            </el-select>
-            <!-- <div v-if="selectedTags[group.name]">
-              选择的{{ group.name }}标签ID: {{ selectedTags[group.name] }}
-            </div> -->
-            <el-divider />
-          </div>
-        </div>
-        <el-form-item
-          class="footer"
-          style="margin-top: 14px"
-          v-if="ProductLabelsList === null"
-        >
-          <el-button
-            plain
-            style="width: 100%"
-            @click="AddProductLabelsVisible = false"
-            >取消</el-button
-          >
-        </el-form-item>
-        <el-form-item class="footer" v-else>
-          <el-button
-            plain
-            style="width: 48%"
-            @click="AddProductLabelsVisible = false"
-            >取消</el-button
-          >
-          <el-button
-            plain
-            style="width: 48%"
-            v-if="ProductLabelsList !== null"
-            @click="AddProductLabelsInfo"
-            >修改商品标签</el-button
           >
         </el-form-item>
       </el-form>
     </el-dialog>
   </div>
 </template>
-  
-  <script lang="ts" setup>
-import { addProductTag, addSpec } from "@/api/add";
-import { deleteSpec } from "@/api/delete";
-import { getAvailableTag, selectSpec } from "@/api/Querying";
+
+<script lang="ts" setup>
+import { addSpec,selectProduct,deleteProduct,updateProduct } from "@/api/treasureHunt";
 import { setImageUrls, uploadImages } from "@/api/img";
-import { updateProductTag, updateSpec } from "@/api/update";
 import { ElMessage } from "element-plus";
 import { onMounted, ref } from "vue";
 
 const loading = ref(false);
+
 // const storedToken = localStorage.getItem("token");
 // if (!storedToken) {
 //   ElMessage.error("請先登入");
 //   router.push('/login')
 // }
 const form = ref({
-  spec_name: "",
-  spec_name_en: "",
+  // 商品名
+  name: "",
+  // 英文商品名
+  name_en: "",
+  // 拼音商品名
+  name_pin_yin: "",
   // 页码 0-查全部 从1开始
   page: 0,
   // 状态 0-下架 1-上架
-  status: null,
+  status: "",
   // 基础库存 0-库存不足 1-库存充足
-  stock: null,
-  point:0,
+  stock: "",
 });
 const options = [
+  { label: "上架", value: "1" },
+  { label: "下架", value: "0" },
+];
+const optionsNum = [
   { label: "上架", value: 1 },
   { label: "下架", value: 0 },
 ];
 const options1 = [
-  { label: "库存充足", value: 1 },
-  { label: "库存不足", value: 0 },
+  { label: "库存充足", value: "1" },
+  { label: "库存不足", value: "0" },
 ];
 const tableData = ref([]);
 const pagination = ref({
@@ -359,7 +334,7 @@ const pagination = ref({
 const getInfo = async () => {
   try {
     loading.value = true;
-    const res = await selectSpec({
+    const res = await selectProduct({
       ...form.value,
     });
     // page: pagination.value.page,
@@ -376,6 +351,7 @@ const getInfo = async () => {
           item.image_urls = JSON.parse(item.image_urls)[0];
         }
       });
+
       pagination.value.total = res.data.data.page_size;
       pagination.value.pageSize = res.data.data.page_size;
     } else {
@@ -390,10 +366,11 @@ const getInfo = async () => {
 
 const ResetgetInfo = () => {
   form.value = {
-    spec_name: "",
-    spec_name_en: "",
-    status: null,
-    stock: null,
+    name: "",
+    name_en: "",
+    name_pin_yin: "",
+    status: "",
+    stock: "",
     page: 0,
   };
   pagination.value.page = 1;
@@ -409,7 +386,7 @@ const deleteInfo = async (id: number) => {
   console.log("id", id);
   try {
     loading.value = true;
-    const res = await deleteSpec({ spec_id: id });
+    const res = await deleteProduct({ product_id: id });
     if (res.data.code === 0) {
       ElMessage.success("删除成功");
       getInfo();
@@ -423,51 +400,66 @@ const deleteInfo = async (id: number) => {
 };
 
 const dialogTableVisible1 = ref(false);
-const updateForm = ref({
+const UpdateForm = ref({
+  category_id: "",
+  description: "",
+  name: "",
+  name_en: "",
+  name_pin_yin: "",
   price: "",
+  product_id: "",
   sort: "",
-  spec_id: null,
-  spec_name: null,
-  spec_name_en: null,
-  stock: null,
   status: "",
-  point:0,
+  stock: "",
 });
 const updateInfoclick = (row: any) => {
-  updateForm.value = {
+  UpdateForm.value = {
+    category_id: row.category_id || null,
+    description: row.description || "",
+    name: row.name || "",
+    name_en: row.name_en || "",
+    name_pin_yin: row.name_pin_yin || "",
     price: row.price || "",
+    product_id: row.id || null,
     sort: row.sort || null,
-    spec_id: row.id || null,
-    spec_name: row.spec_name || "",
-    spec_name_en: row.spec_name_en || "",
+    status: row.status || null,
     stock: row.stock || null,
-    status: row.status,
-    point:row.point||0,
   };
+  console.log("row", UpdateForm.value);
+
   dialogTableVisible1.value = true;
 };
-const updateFormRef = ref();
-const rules = ref({
-  price: [{ required: true, message: "请输入价格", trigger: "change" }],
-  spec_name: [{ required: true, message: "请输入规格名", trigger: "change" }],
-  spec_name_en: [
-    { required: true, message: "请输入英文规格名", trigger: "change" },
+const UpdateFormRef = ref();
+const UpdateFormrules = ref({
+  description: [
+    { required: true, message: "商品描述不能为空", trigger: "change" },
   ],
-  stock: [{ required: true, message: "请输入库存", trigger: "change" }],
-  status: [{ required: true, message: "请选择状态", trigger: "change" }],
+  name: [{ required: true, message: "商品名不能为空", trigger: "change" }],
+  name_en: [
+    { required: true, message: "英文商品名不能为空", trigger: "change" },
+  ],
+  name_pin_yin: [
+    { required: true, message: "拼音商品名不能为空", trigger: "change" },
+  ],
+  price: [{ required: true, message: "基础价格不能为空", trigger: "change" }],
+  status: [
+    { required: true, message: "状态不能为空", trigger: "change" },
+    { type: "number", message: "状态只能输入数字", trigger: "change" },
+  ],
+  stock: [
+    { required: true, message: "基础库存不能为空", trigger: "change" },
+    { type: "number", message: "库存只能输入数字", trigger: "change" },
+  ],
 });
-const updateInfo = async () => {
-  updateFormRef.value.validate(async (valid: boolean) => {
+const UpdateInfo = async () => {
+  UpdateFormRef.value.validate(async (valid: boolean) => {
     if (valid) {
       try {
-        const res = await updateSpec({
-          ...updateForm.value,
-          status: String(updateForm.value.status),
-        });
+        const res = await updateProduct(UpdateForm.value);
         if (res.data.code === 0) {
           ElMessage.success("修改成功");
           // 清空表单并重置验证状态
-
+          UpdateFormRef.value.resetFields();
           dialogTableVisible1.value = false;
           getInfo();
         } else {
@@ -478,89 +470,63 @@ const updateInfo = async () => {
       } finally {
         // dialogTableVisible1.value = false;
       }
+    } else {
+      console.log("验证失败");
     }
   });
 };
-const ProductLabelsList = ref();
-const AddProductLabelsVisible = ref(false);
-const AddProductLabelsForm = ref({
-  product_spec_id: null,
+
+const AddSpecificationsVisible = ref(false);
+const AddSpecificationsForm = ref({
+  product_id: null,
+  price: "",
+  spec_name: "",
+  spec_name_en: "",
+  stock: null,
+  status: null,
 });
-const uploadProductForm = ref({
-  product_spec_name: "",
+const AddSpecificationsrules = ref({
+  product_id: [
+    { required: true, message: "商品id不能为空", trigger: "change" },
+    { pattern: /^\d+$/, message: "商品id只能输入数字", trigger: "change" },
+  ],
+  spec_name: [{ required: true, message: "规格名不能为空", trigger: "change" }],
+
+  spec_name_en: [
+    { required: true, message: "英文规格名不能为空", trigger: "change" },
+  ],
+  price: [{ required: true, message: "价格不能为空", trigger: "change" }],
+  status: [{ required: true, message: "状态不能为空", trigger: "change" }],
+  stock: [
+    { required: true, message: "库存不能为空", trigger: "change" },
+    { pattern: /^\d+$/, message: "库存只能输入数字", trigger: "change" },
+  ],
 });
-
-const AddProductLabelsFormRef = ref();
-const AddProductLabels = async (row: any) => {
-  AddProductLabelsForm.value.product_spec_id = row.id;
-  uploadProductForm.value.product_spec_name = row.spec_name;
-  console.log("row", row);
-
-  const res = await getAvailableTag(AddProductLabelsForm.value);
-  if (res.data.code === 0) {
-    AddProductLabelsVisible.value = true;
-    // console.log("res.data.data.list", res.data.data.list);
-    if (res.data.data.list == null || res.data.data.list.length === 0) {
-      ProductLabelsList.value = null;
-      return;
-    }
-    console.log("res.data.data", res.data.data);
-
-    if (res.data.data.list !== null || res.data.data.list.length > 0) {
-      ProductLabelsList.value = res.data.data.list;
-      console.log("res.data.data.list.tags", res.data.data.list.tags);
-      setDefaultSelectedTags(); // 打开弹窗时设置默认选中的标签
-    }
-  } else {
-    ElMessage.error(res.data.data.message_zh);
-  }
+const AddSpecificationsFormRef = ref();
+const AddSpecificationsClick = (row: any) => {
+  AddSpecificationsForm.value.product_id = row.id;
+  AddSpecificationsVisible.value = true;
 };
-// 用来存储用户选择的标签id
-const selectedTags = ref<any>({});
-// 在初始化时设置默认选择
-const setDefaultSelectedTags = () => {
-  ProductLabelsList.value.forEach(
-    (group: { tags: any[]; name: string | number }) => {
-      if (group.tags === null) {
-        return;
-      }
-      group.tags.forEach((tag) => {
-        if (tag.selected === 1) {
-          console.log(
-            " selectedTags.value[group.name] = tag.id; // 设置默认选中的标签",
-            selectedTags.value[group.name],
-            tag.id
-          );
-
-          selectedTags.value[group.name] = tag.id; // 设置默认选中的标签
-        }
-      });
-    }
-  );
-};
-// 处理标签变化时，记录选择
-const handleTagChange = (groupName: string, selectedId: number) => {
-  selectedTags.value[groupName] = selectedId;
-};
-
-const AddProductLabelsInfo = async () => {
-  AddProductLabelsFormRef.value.validate(async (valid: boolean) => {
-    const selectedTagIds = Object.values(selectedTags.value).filter(
-      (tagId) => tagId !== null
-    );
-
-    if (selectedTagIds.length > 0) {
+const AddSpecificationsInfo = async () => {
+  AddSpecificationsFormRef.value.validate(async (valid: boolean) => {
+    if (valid) {
       try {
-        const res = await updateProductTag({
-          product_spec_id: AddProductLabelsForm.value.product_spec_id,
-          tag_ids: selectedTagIds,
+        console.log(
+          "AddSpecificationsForm",
+          AddSpecificationsForm.value,
+          Number()
+        );
+
+        const res = await addSpec({
+          ...AddSpecificationsForm.value,
+          status: Number(AddSpecificationsForm.value.status),
         });
         if (res.data.code === 0) {
-          ElMessage.success("修改成功");
+          ElMessage.success("添加成功");
           // 清空表单并重置验证状态
-          AddProductLabelsFormRef.value.resetFields();
-
-          AddProductLabelsVisible.value = false;
+          AddSpecificationsFormRef.value.resetFields();
+          AddSpecificationsVisible.value = false;
+          getInfo();
         } else {
           ElMessage.error(res.data.data.message_zh);
         }
@@ -570,20 +536,9 @@ const AddProductLabelsInfo = async () => {
         // dialogTableVisible.value = false;
       }
     } else {
-      ElMessage.error("请选择标签");
+      console.log("验证失败");
     }
   });
-};
-
-// 点击取消按钮时，清空选中的标签
-const cancelSelection = () => {
-  resetSelectedTags();
-  // dialogVisible.value = false; // 关闭弹窗
-};
-
-// 清空选中的标签
-const resetSelectedTags = () => {
-  selectedTags.value = {}; // 清空选中的标签
 };
 
 const fileList = ref<File[]>([]); // 存储文件列表
@@ -617,14 +572,13 @@ const handleBeforeUpload = async (file: File) => {
   return false; // 阻止默认上传行为，使用自定义上传方法
 };
 const loadingImg = ref(false);
-const associated_id = ref(0);
+const associated_id = ref("");
 // 文件上传函数
 const uploadFile = async (file: File, extension: string) => {
-  loadingImg.value = true;
-  // const formData = new FormData();
-  // formData.append("file", file); // 把文件附加到 FormData 对象中
-
   try {
+    loadingImg.value = true;
+    // const formData = new FormData();
+    // formData.append("file", file); // 把文件附加到 FormData 对象中
     // 1. 提取文件后缀并重命名
     const originalFileName = file.name;
     const fileExtension = originalFileName.slice(
@@ -648,7 +602,7 @@ const uploadFile = async (file: File, extension: string) => {
       const res = await setImageUrls({
         associated_id: associated_id.value,
         url_list: response.data.data.url_list,
-        flag: "3",
+        flag: "2",
       });
       console.log("res", res);
       ElMessage.success("图片上传成功！");
@@ -681,13 +635,12 @@ const handleFileChange = (file: File, fileList: File[]) => {
   // 在文件列表变化时更新文件列表
   fileList = fileList;
 };
-
 onMounted(() => {
   getInfo();
 });
 </script>
-  
-  <style scoped lang="less">
+
+<style scoped lang="less">
 .Landscape {
   display: flex;
 }
@@ -724,10 +677,15 @@ onMounted(() => {
 .el-button {
   margin: 0px;
 }
-
 .fenye {
   display: flex;
   justify-content: center;
+}
+.footer {
+  display: flex;
+  :deep(.el-form-item__content) {
+    justify-content: center;
+  }
 }
 :deep(.el-upload) {
   display: flex;
@@ -737,4 +695,3 @@ onMounted(() => {
   flex-wrap: wrap;
 }
 </style>
-  
