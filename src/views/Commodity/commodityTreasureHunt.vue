@@ -602,7 +602,7 @@ const uploadFile = async (file: File, extension: string) => {
       const res = await setImageUrls({
         associated_id: associated_id.value,
         url_list: response.data.data.url_list,
-        flag: "2",
+        flag: "4",
       });
       console.log("res", res);
       ElMessage.success("图片上传成功！");
