@@ -63,7 +63,7 @@
                 >重置</el-button
               >
               <el-button size="small" plain @click="Addclick"
-                >添加商品</el-button
+                >添加类别</el-button
               >
             </div>
           </el-form-item>
@@ -173,7 +173,7 @@
     </div>
     <el-dialog
       v-model="dialogTableVisible"
-      title="添加子类"
+      :title="title"
       style="max-width: 600px"
     >
       <el-form
@@ -533,9 +533,11 @@ const updateInfo = async () => {
   }
 };
 
+const title = ref("添加子类");
 // ! 添加类别
 const dialogTableVisible = ref(false);
 const AddChildclick = (row: any) => {
+  title.value = "添加子类";
   AddForm.value.parent_id = row.id;
   console.log("row.id", row.id);
   dialogTableVisible.value = true;
@@ -558,6 +560,7 @@ const rules = ref({
 });
 const AddFormRef = ref();
 const Addclick = () => {
+  title.value = "添加类别";
   AddForm.value.parent_id = 0;
   dialogTableVisible.value = true;
 };
