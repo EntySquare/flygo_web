@@ -18,3 +18,12 @@ export const setImageUrls = (data: any) => {
         data,
     })
 }
+
+// 上传图片 返回url API file_type
+export const upload = (data: any) => {
+    return fileRequest({
+        url: '/upload',
+        method: 'post',
+        data,
+    })
+}

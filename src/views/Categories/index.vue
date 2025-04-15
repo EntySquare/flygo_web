@@ -282,6 +282,7 @@
         <el-form-item label="基础库存" prop="stock">
           <el-input clearable v-model.trim.number="CommodityForm.stock" />
         </el-form-item>
+        <Tinymce style="margin-bottom:20px" v-model="CommodityForm.content" @change="handleChange" width="100%" />
         <el-form-item class="footer">
           <el-button plain style="width: 48%" @click="CommodityVisible = false"
             >取消</el-button
@@ -330,7 +331,11 @@ import { selectCategory } from "@/api/Querying";
 import { updateCategory } from "@/api/update";
 import { ElMessage } from "element-plus";
 import { onMounted, ref } from "vue";
-
+import Tinymce from "@/components/Tinymce/Tinymce.vue";
+let content = ref('')
+function handleChange (item) {
+    console.log('change', item)
+}
 const loading = ref(false);
 
 // const storedToken = localStorage.getItem("token");
@@ -537,6 +542,7 @@ const CommodityVisible = ref(false);
 const CommodityForm = ref({
   category_id: null,
   description: "",
+  content: "",
   name: "",
   name_en: "",
   name_pin_yin: "",
