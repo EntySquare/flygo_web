@@ -22,6 +22,7 @@
     "normalize.css": "^8.0.1",
     "nprogress": "^0.2.0",
     "pinia": "^2.1.6",
+    "tinymce": "^5.10.2",
     "vue": "^3.3.4",
     "vue-loading-overlay": "^6.0.3",
     "vue-router": "^4.2.4",

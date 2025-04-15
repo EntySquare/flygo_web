@@ -208,6 +208,7 @@
         <el-form-item label="积分" prop="point">
           <el-input clearable v-model.trim.number="UpdateForm.point" />
         </el-form-item>
+        <Tinymce style="margin-bottom:20px" v-model="UpdateForm.content" @change="handleChange" width="100%" />
         <el-form-item class="footer">
           <el-button
             plain
@@ -302,9 +303,11 @@ import { setImageUrls, uploadImages } from "@/api/img";
 import { updateProduct } from "@/api/update";
 import { ElMessage } from "element-plus";
 import { onMounted, ref } from "vue";
-
+import Tinymce from "@/components/Tinymce/Tinymce.vue";
 const loading = ref(false);
-
+function handleChange (item) {
+    console.log('change', item)
+}
 // const storedToken = localStorage.getItem("token");
 // if (!storedToken) {
 //   ElMessage.error("請先登入");
@@ -416,6 +419,7 @@ const dialogTableVisible1 = ref(false);
 const UpdateForm = ref({
   category_id: "",
   description: "",
+  content: "",
   name: "",
   name_en: "",
   name_pin_yin: "",
@@ -430,6 +434,7 @@ const updateInfoclick = (row: any) => {
   UpdateForm.value = {
     category_id: row.category_id || null,
     description: row.description || "",
+    content: row.content || "",
     name: row.name || "",
     name_en: row.name_en || "",
     name_pin_yin: row.name_pin_yin || "",
