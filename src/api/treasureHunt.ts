@@ -117,3 +117,53 @@ export const updateProductTag = (data: any) => {
     })
 }
 
+// 询参与夺宝的商品 夺宝
+export const selectItem = (data: any) => {
+    return request({
+        url: '/treasureHunt/selectItem',
+        method: 'post',
+        data,
+    })
+}
+
+// 添加夺宝参与的商品
+export const addItem = (data: any) => {
+    return request({
+        url: '/treasureHunt/addItem',
+        method: 'post',
+        data,
+    })
+}
+// 修改夺宝参与的商品的状态为进行中
+export const updateItemStatusProcessing = (data: any) => {
+    return request({
+        url: '/treasureHunt/updateItemStatusProcessing',
+        method: 'post',
+        data,
+    })
+}
+// 查询夺宝中奖订单
+export const adminQueryPurchaseOrder = (data: any) => {
+    return request({
+        url: '/treasureHuntOrder/adminQueryPurchaseOrder',
+        method: 'post',
+        data,
+    })
+}
+
+// 处理中奖订单(提货/转卖)
+export const handleWinner = (data: any) => {
+    return request({
+        url: '/treasureHuntOrder/handleWinner',
+        method: 'post',
+        data,
+    })
+}
+// 后台更新用户夺宝订单的物流状态
+export const updateShippingStatus = (data: any) => {
+    return request({
+        url: '/treasureHuntOrder/updateShippingStatus',
+        method: 'post',
+        data,
+    })
+}

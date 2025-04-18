@@ -46,6 +46,16 @@ const deta = [
         path: '/user', component: () => import('@/views/user/index.vue')
     },
     {
+        name: 'treasureHunt',
+        lable: '夺宝列表',
+        path: '/treasureHunt', component: () => import('@/views/treasureHunt/list.vue')
+    },
+    {
+        name: 'winningList',
+        lable: '夺宝中奖列表',
+        path: '/treasureHunt-winningList', component: () => import('@/views/treasureHunt/winningList.vue')
+    },
+    {
         name: 'purchase',
         lable: '购买订单',
         path: '/purchase', component: () => import('@/views/Purchase/Purchase.vue')
