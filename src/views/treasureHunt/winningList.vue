@@ -124,35 +124,7 @@
         <!-- <el-table-column show-overflow-tooltip prop="shipping_address" label="收货地址" /> -->
         <el-table-column prop="shipping_status" label="物流状态">
             <template #default="{ row }">
-            <el-dropdown
-              trigger="click"
-              @command="handleStatusChange(row, $event)"
-            >
-              <el-button size="small">
-                {{
-                  row.shipping_status === 0
-                    ? "未发货"
-                    : row.shipping_status === 1
-                    ? "预备发货"
-                    : row.shipping_status === 2
-                    ? "已发货"
-                    : row.shipping_status === 3
-                    ? "派送中"
-                    : row.shipping_status === 4
-                    ? "已签收"
-                    : "确认收货"
-                }}
-              </el-button>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item :command="1">预备发货</el-dropdown-item>
-                  <el-dropdown-item :command="2">已发货</el-dropdown-item>
-                  <el-dropdown-item :command="3">派送中</el-dropdown-item>
-                  <el-dropdown-item :command="4">已签收</el-dropdown-item>
-                  <el-dropdown-item :command="5">确认收货</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
+                <span>{{ shippingStatusOptions.find(item => item.value == row.shipping_status)?.label || '未知状态' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态">
@@ -170,6 +142,12 @@
                 plain
                 @click="modifyWinner(row.status,row.id)"
                 >处理中奖</el-button
+              >
+              <el-button
+                size="small"
+                plain
+                @click="modifyShippingStatus(row)"
+                >物流状态</el-button
               >
             </div>
           </template>
@@ -214,6 +192,47 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+    <el-dialog
+      v-model="dialogTableVisible2"
+      title="处理物流状态"
+      style="max-width: 600px"
+    >
+      <el-form
+        :model="shippingForm"
+        ref="shippingFormRef"
+        label-width="auto"
+        :rules="shippingFormrules"
+      >
+        <el-form-item label="物流单号" prop="tracking_number">
+          <el-input clearable v-model.trim="shippingForm.tracking_number" />
+        </el-form-item>
+        <el-form-item label="物流状态" prop="shipping_status">
+            <el-select
+                v-model="shippingForm.shipping_status"
+                placeholder="Select"
+                style="width: 176px"
+              >
+                <el-option
+                  v-for="item in shippingStatusOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+        </el-form-item>
+        <el-form-item class="footer">
+          <el-button
+            plain
+            style="width: 48%"
+            @click="dialogTableVisible2 = false"
+            >取消</el-button
+          >
+          <el-button plain style="width: 48%" @click="confirmShipping()"
+            >确认</el-button
+          >
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
@@ -228,8 +247,10 @@ import { ElMessage } from "element-plus";
 import { onMounted, ref } from "vue";
 const loading = ref(false);
 const dialogTableVisible1 = ref(false);
+const dialogTableVisible2 = ref(false);
 const tableData = ref([]);
 const winningFormRef = ref();
+const shippingFormRef = ref();
 const form = ref({
     handle_status: null,
     order_no: null,
@@ -241,7 +262,16 @@ const form = ref({
 const winningForm = ref({
     tracking_number:''
 });
+const shippingForm = ref({
+    tracking_number:'',
+    shipping_status:0
+});
 const winningFormrules = ref({
+    tracking_number	: [
+    { required: true, message: "物流单号不能为空", trigger: "change" },
+  ],
+});
+const shippingFormrules = ref({
     tracking_number	: [
     { required: true, message: "物流单号不能为空", trigger: "change" },
   ],
@@ -251,12 +281,12 @@ const handleStatusOptions = [
   { label: "已处理", value: "1" },
 ]
 const shippingStatusOptions = [
-  { label: "未发货", value: "0" },
-  { label: "预备发货", value: "1" },
-  { label: "已发货", value: "2" },
-  { label: "派送中", value: "3" },
-  { label: "已签收", value: "4" },
-  { label: "确认收货", value: "5" },
+  { label: "未发货", value: 0 },
+  { label: "预备发货", value: 1 },
+  { label: "已发货", value: 2 },
+  { label: "派送中", value: 3 },
+  { label: "已签收", value: 4 },
+  { label: "确认收货", value: 5 },
 ]
 const statusOptions = [
   { label: "中奖", value: "Winner" },
@@ -300,6 +330,21 @@ const modifyWinner = (status:any,id: any) => {
         });
     }
 };
+const confirmShipping = () =>{
+    shippingFormRef.value.validate(async (valid: boolean) => {
+        if (valid) {
+            const res = await updateShippingStatus(shippingForm.value);
+            if (res.data.code === 0) {
+                ElMessage.success("状态变化处理成功");
+                dialogTableVisible2.value = false;
+                await getInfo();
+            } else {
+                ElMessage.error("状态变化处理失败");
+            }
+        }
+    })
+   
+}
 const confirm = () => {
 winningFormRef.value.validate(async (valid: boolean) => {
     if (valid) {
@@ -315,8 +360,13 @@ winningFormRef.value.validate(async (valid: boolean) => {
     }
   });
 };
-const add = () => {
-  dialogTableVisible1.value = true;
+const modifyShippingStatus = (row:any) => {
+  dialogTableVisible2.value = true;
+  shippingForm.value = {
+    order_no:'',
+    shipping_status:row.shipping_status,
+    order_no:row.order_no,
+  }
 };
 const ResetgetInfo = () => {
   form.value = {
