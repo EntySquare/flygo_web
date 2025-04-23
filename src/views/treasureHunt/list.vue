@@ -1,7 +1,7 @@
 <template>
   <div class="home_view">
     <div style="margin-bottom: 14px">
-      <el-text class="mx-1" size="large">夺宝列表</el-text>
+      <el-text class="mx-1" size="large">夺宝配置</el-text>
     </div>
     <el-form
           label-position="left"
@@ -68,6 +68,9 @@
           <el-button style="margin-left:15px" type="primary" @click="keepKeyValues('treasure_hunt_point_partake')">保存</el-button>
         </el-form-item>
       </el-form>
+    <div style="margin-bottom: 14px">
+      <el-text class="mx-1" size="large">夺宝列表</el-text>
+    </div>
     <div class="cont">
       <div class="phone_input">
         <el-form
@@ -89,7 +92,7 @@
             <div class="Landscape">
               <el-select
                 v-model="form.buy_type"
-                placeholder="Select"
+                placeholder="选择类型"
                 style="width: 176px"
               >
                 <el-option
@@ -105,7 +108,7 @@
             <div class="Landscape">
               <el-select
                 v-model="form.status"
-                placeholder="Select"
+                placeholder="选择状态"
                 style="width: 176px"
               >
                 <el-option
@@ -125,7 +128,8 @@
         </el-form>
       </div>
       <el-table :data="tableData" style="width: 100%" v-loading="loading">
-        <el-table-column prop="product_name" label="商品名" />
+        <el-table-column prop="id" label="夺宝ID" />
+        <el-table-column prop="product_name" label="夺宝商品名" />
         <el-table-column prop="product_id" label="夺宝商品ID" />
         <el-table-column prop="buy_type" label="类型">
           <template #default="{ row }">
@@ -139,15 +143,17 @@
         <el-table-column prop="total_slots" label="总需人次" />
         <el-table-column prop="status" label="状态">
           <template #default="{ row }">
-            <span v-if="row.status=='NotStarted'">未进行</span>
-            <span v-else-if="row.status=='Processing'">进行中</span>
-            <span v-else-if="row.status=='End'">结束</span>
+            <span v-if="row.status=='NotStarted'">未进行 </span>
+            <span v-else-if="row.status=='Processing'">进行中 </span>
+            <span v-else-if="row.status=='End'">结束 </span>
+
+            <el-button v-if="row.status=='NotStarted'" size="small" plain @click="modifyState(row.id)">进行中</el-button>
+
           </template>
         </el-table-column>
         <el-table-column label="操作">
           <template #default="{ row }">
             <div style="display: flex; flex-wrap: wrap; gap: 4px">
-              <el-button v-if="row.status=='NotStarted'" size="small" plain @click="modifyState(row.id)">修改状态</el-button>
               <el-button v-if="row.status!='End'" size="small" plain @click="modifyWinningState(row.id)">设置中奖</el-button>
             </div>
           </template>

@@ -21,7 +21,7 @@
               <el-select
               clearable
                 v-model="form.review"
-                placeholder="Select"
+                placeholder="选择审核状态"
                 style="width: 176px"
               >
                 <el-option
@@ -33,12 +33,12 @@
               </el-select>
             </div>
           </el-form-item>
-          <el-form-item label="状态筛选: ">
+          <el-form-item label="申请状态: ">
             <div class="Landscape">
               <el-select
               clearable
                 v-model="form.status"
-                placeholder="Select"
+                placeholder="选择申请状态"
                 style="width: 176px"
               >
                 <el-option
@@ -61,15 +61,15 @@
       </div>
       <el-table :data="tableData" style="width: 100%" v-loading="loading">
         <el-table-column prop="order_no" label="订单号" />
-        <el-table-column prop="user_name" label="用户名" />
         <el-table-column prop="user_id" label="用户ID" />
+        <el-table-column prop="user_name" label="用户名" />
+        <el-table-column prop="phone" label="用户手机号" />
+        <el-table-column prop="email" label="用户邮箱" />
         <el-table-column prop="account_no" label="账号" />
         <el-table-column prop="amount" label="提现金额" />
         <el-table-column prop="contact_info" label="联系方式" />
-        <el-table-column prop="email" label="邮箱" />
-        <el-table-column prop="payment_method" label="支付方式" />
-        <el-table-column prop="phone" label="手机号" />
-        <el-table-column prop="remarks" label="备注" />
+        <el-table-column prop="payment_method" label="收款方式" />
+        <el-table-column prop="remarks" label="反驳原因" />
         <el-table-column prop="review" label="审核状态">
           <template #default="{ row }">
                 <span>{{ reviewList.find(item => item.value == row.review)?.label || '未知状态' }}</span>
@@ -88,7 +88,7 @@
                 plain
                 v-if="row.status == 1"
                 @click="modifyWithdrawal(row.id)"
-                >提现申请</el-button
+                >审核</el-button
               >
             </div>
           </template>
@@ -97,7 +97,7 @@
     </div>
     <el-dialog
       v-model="dialogTableVisible1"
-      title="提现申请"
+      title="提现申请审核"
       style="max-width: 600px"
     >
       <el-form
@@ -112,7 +112,7 @@
         <el-form-item label="状态" prop="review">
             <el-select
                 v-model="withdrawalForm.review"
-                placeholder="Select"
+                placeholder="选择审核状态"
                 style="width: 176px"
               >
                 <el-option label="通过" :value="1" />

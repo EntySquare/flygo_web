@@ -73,6 +73,7 @@
         </el-form>
       </div>
       <el-table :data="tableData" style="width: 100%" v-loading="loading">
+        <el-table-column prop="order_no" label="订单编号" />
         <el-table-column prop="discount" label="折扣金额" />
         <el-table-column prop="goodsImage" label="商品图片"
           ><template #default="{ row }">
@@ -85,7 +86,7 @@
         <el-table-column prop="order_id" label="订单编号" />
         <el-table-column prop="paid_at" label="支付时间" />
         <el-table-column prop="pay_amount" label="实际支付金额" />
-
+        <el-table-column prop="total_amount" label="总金额" />
         <!-- 订单状态 0=待付款 1=已付款 -1=付款失败 2=退款中 3=退款成功 4=退款失败/取消 -->
         <el-table-column prop="status" label="订单状态">
           <template #default="{ row }">
@@ -137,7 +138,6 @@
             </el-dropdown>
           </template>
         </el-table-column>
-        <el-table-column prop="total_amount" label="总金额" />
         <el-table-column label="操作">
           <template #default="{ row }">
             <el-button
@@ -324,10 +324,10 @@ const handleDateChange = () => {
 };
 
 const getInfo = async () => {
-  if (form.value.time_duration.length === 0) {
-    ElMessage.error("请选择日期范围");
-    return;
-  }
+  // if (form.value.time_duration.length === 0) {
+  //   ElMessage.error("请选择日期范围");
+  //   return;
+  // }
   try {
     loading.value = true;
     const res = await adminQueryPurchaseOrder(form.value);
@@ -468,7 +468,7 @@ const ViewOrderReviewsRow = async (row: any) => {
   }
 };
 onMounted(() => {
-  // getInfo();
+  getInfo();
 });
 </script>
 <style scoped lang="less">

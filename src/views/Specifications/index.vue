@@ -119,6 +119,7 @@
           }}</template>
         </el-table-column>
         <el-table-column prop="stock" label="基础库存">
+
           <template #default="{ row }">
 <!--            {{ row.stock === 0 ? "库存不足" : "库存充足" }}-->
             {{ row.stock  }}

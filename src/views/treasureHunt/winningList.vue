@@ -110,14 +110,16 @@
                 />
           </template>
         </el-table-column>
-        <el-table-column prop="total_amount" label="总金额" />
+<!--        <el-table-column prop="total_amount" label="总金额" />-->
         <el-table-column prop="tracking_number" label="物流跟踪号" />
-        <el-table-column prop="order_id" label="订单id" />
-        <el-table-column prop="pay_amount" label="实际支付金额" />
+<!--        <el-table-column prop="order_id" label="订单id" />-->
+<!--        <el-table-column prop="pay_amount" label="实际支付金额" />-->
         <el-table-column prop="pay_type" label="支付方式">
             <template #default="{ row }">
                 <span v-if="row.pay_type==1">paypal</span>
-                <span v-else-if="row.pay_type==2">stripe</span>
+              <span v-else-if="row.pay_type==2">stripe</span>
+              <span v-else-if="row.pay_type==3">余额</span>
+              <span v-else-if="row.pay_type==4">积分</span>
             </template>
         </el-table-column>
         <el-table-column prop="product_id" label="夺宝商品ID" />

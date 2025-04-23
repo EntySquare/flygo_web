@@ -142,7 +142,7 @@
                 >修改</el-button
               >
               <el-button size="small" plain @click="add(row)"
-                >新增</el-button
+                >新增夺宝</el-button
               >
               <el-button size="small" plain @click="AddSpecificationsClick(row)"
                 >添加规格</el-button
@@ -287,7 +287,7 @@
     </el-dialog>
     <el-dialog
       v-model="dialogTableVisible3"
-      title="新增"
+      title="新增夺宝"
       style="max-width: 600px"
     >
       <el-form
@@ -300,7 +300,7 @@
           <div class="Landscape">
               <el-select
                 v-model="addForm.buy_type"
-                placeholder="Select"
+                placeholder="夺宝购买类型"
                 style="width: 176px"
               >
                 <el-option
