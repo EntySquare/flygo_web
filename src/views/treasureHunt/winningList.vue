@@ -1,7 +1,7 @@
 <template>
   <div class="home_view">
     <div style="margin-bottom: 14px">
-      <el-text class="mx-1" size="large">夺宝列表</el-text>
+      <el-text class="mx-1" size="large">夺宝中奖列表</el-text>
     </div>
     <div class="cont">
       <div class="phone_input">
@@ -41,6 +41,7 @@
           <el-form-item label="处理状态: ">
             <div class="Landscape">
               <el-select
+              clearable
                 v-model="form.handle_status"
                 placeholder="Select"
                 style="width: 176px"
@@ -57,6 +58,7 @@
           <el-form-item label="物流状态: ">
             <div class="Landscape">
               <el-select
+              clearable
                 v-model="form.shipping_status"
                 placeholder="Select"
                 style="width: 176px"
@@ -277,8 +279,8 @@ const shippingFormrules = ref({
   ],
 });
 const handleStatusOptions = [
-  { label: "未处理", value: "0" },
-  { label: "已处理", value: "1" },
+  { label: "未处理", value: 0 },
+  { label: "已处理", value: 1 },
 ]
 const shippingStatusOptions = [
   { label: "未发货", value: 0 },

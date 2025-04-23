@@ -44,6 +44,14 @@ const deta = [
         name: 'user',
         lable: '用户列表',
         path: '/user', component: () => import('@/views/user/index.vue')
+    },{
+        name: 'assetList',
+        lable: '用户资产',
+        path: '/user-assetList', component: () => import('@/views/user/assetList.vue')
+    },{
+        name: 'winningList',
+        lable: '提现申请列表',
+        path: '/user-withdrawList', component: () => import('@/views/user/winningList.vue')
     },
     {
         name: 'treasureHunt',

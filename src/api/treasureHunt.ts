@@ -167,3 +167,28 @@ export const updateShippingStatus = (data: any) => {
         data,
     })
 }
+
+// 设置夺宝中奖用户
+export const setWinner = (data: any) => {
+    return request({
+        url: '/treasureHunt/setWinner',
+        method: 'post',
+        data,
+    })
+}
+// 获取系统配置值
+export const getKeyValues = () => {
+    return request({
+        url: '/keyValues/get',
+        method: 'get',
+    })
+}
+
+// 更新系统配置值
+export const keyValuesUpdate = (data: any) => {
+    return request({
+        url: '/keyValues/update',
+        method: 'post',
+        data,
+    })
+}

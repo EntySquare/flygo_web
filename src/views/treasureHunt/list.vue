@@ -3,6 +3,63 @@
     <div style="margin-bottom: 14px">
       <el-text class="mx-1" size="large">夺宝列表</el-text>
     </div>
+    <el-form
+          label-position="left"
+          :inline="true"
+          label-width="auto"
+          style="max-width: 100%"
+        >
+        <el-form-item label="夺宝参与积分数量: ">
+          <div class="Landscape">
+            <el-input
+              style="width: 175px"
+              clearable
+              v-model.trim="keyValues.treasure_hunt_point_involved"
+            />
+          </div>
+          <el-button style="margin-left:15px" type="primary" @click="keepKeyValues('treasure_hunt_point_involved')">保存</el-button>
+        </el-form-item>
+        <el-form-item label="夺宝参与金额: ">
+          <div class="Landscape">
+            <el-input
+              style="width: 175px"
+              clearable
+              v-model.trim="keyValues.treasure_hunt_amount_involved"
+            />
+          </div>
+          <el-button style="margin-left:15px" type="primary" @click="keepKeyValues('treasure_hunt_amount_involved')">保存</el-button>
+        </el-form-item>
+        <el-form-item label="夺宝邀请次数: ">
+          <div class="Landscape">
+            <el-input
+              style="width: 175px"
+              clearable
+              v-model.trim="keyValues.treasure_hunt_invite"
+            />
+          </div>
+          <el-button style="margin-left:15px" type="primary" @click="keepKeyValues('treasure_hunt_invite')">保存</el-button>
+        </el-form-item>
+        <el-form-item label="夺宝积分/金额每日可参与: ">
+          <div class="Landscape">
+            <el-input
+              style="width: 175px"
+              clearable
+              v-model.trim="keyValues.treasure_hunt_daily"
+            />
+          </div>
+          <el-button style="margin-left:15px" type="primary" @click="keepKeyValues('treasure_hunt_daily')">保存</el-button>
+        </el-form-item>
+        <el-form-item label="夺宝积分参与条件: ">
+          <div class="Landscape">
+            <el-input
+              style="width: 175px"
+              clearable
+              v-model.trim="keyValues.treasure_hunt_point_partake"
+            />
+          </div>
+          <el-button style="margin-left:15px" type="primary" @click="keepKeyValues('treasure_hunt_point_partake')">保存</el-button>
+        </el-form-item>
+      </el-form>
     <div class="cont">
       <div class="phone_input">
         <el-form
@@ -55,15 +112,20 @@
           <el-form-item>
             <el-button size="small" plain @click="getInfo()">查詢</el-button>
             <el-button size="small" plain @click="ResetgetInfo()">重置</el-button>
-            <el-button size="small" plain @click="add()">新增</el-button>
+            <!-- <el-button size="small" plain @click="add()">新增</el-button> -->
           </el-form-item>
         </el-form>
       </div>
       <el-table :data="tableData" style="width: 100%" v-loading="loading">
         <el-table-column prop="product_name" label="商品名" />
         <el-table-column prop="product_id" label="夺宝商品ID" />
-        <el-table-column prop="buy_type" label="类型" />
-        <el-table-column prop="amount" label="金额或积分" />
+        <el-table-column prop="buy_type" label="类型">
+          <template #default="{ row }">
+            <span v-if="row.buy_type=='Amount'">金额</span>
+            <span v-else-if="row.buy_type=='Point'">积分</span>
+          </template>
+        </el-table-column>
+        <!-- <el-table-column prop="amount" label="金额或积分" /> -->
         <el-table-column prop="join_count" label="参与数量" />
         <el-table-column prop="remaining" label="剩余人次" />
         <el-table-column prop="total_slots" label="总需人次" />
@@ -78,6 +140,7 @@
           <template #default="{ row }">
             <div style="display: flex; flex-wrap: wrap; gap: 4px">
               <el-button v-if="row.status=='NotStarted'" size="small" plain @click="modifyState(row.id)">修改状态</el-button>
+              <el-button v-if="row.status!='End'" size="small" plain @click="modifyWinningState(row.id)">设置中奖</el-button>
             </div>
           </template>
         </el-table-column>
@@ -140,22 +203,86 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+    <el-dialog
+      v-model="dialogTableVisible2"
+      title="设置中奖"
+      style="max-width: 400px"
+    >
+    <el-form
+        :model="winningForm"
+        ref="winningFormRef"
+        label-width="auto"
+        :rules="winningFormrules"
+      >
+      <el-form-item label="用户" prop="user_id">
+          <div class="Landscape">
+              <el-select
+                v-model="winningForm.user_id"
+                placeholder="Select"
+                style="width: 176px"
+                @change="getUserInfo"
+                value-key=id
+              >
+                <el-option
+                  v-for="item in userOptions"
+                  :key="item.id"
+                  :label="item.full_name"
+                  :value="item.id"
+                />
+              </el-select>
+            </div>
+        </el-form-item>
+        <el-form-item label="用户手机号">
+          <el-input v-model="userInfo.phone" disabled/>
+        </el-form-item>
+        <el-form-item label="用户邮箱">
+          <el-input v-model="userInfo.email" disabled/>
+        </el-form-item>
+        <el-form-item class="footer">
+          <el-button
+            plain
+            style="width: 48%"
+            @click="dialogTableVisible2 = false"
+            >取消</el-button
+          >
+          <el-button plain style="width: 48%" @click="confirmWinning()"
+            >确认</el-button
+          >
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { selectItem,addItem,updateItemStatusProcessing } from "@/api/treasureHunt";
+import { selectItem,addItem,updateItemStatusProcessing,setWinner,getKeyValues,keyValuesUpdate } from "@/api/treasureHunt";
 import { setImageUrls, uploadImages } from "@/api/img";
+import { userList } from "@/api/Querying";
 import { ElMessage } from "element-plus";
 import { onMounted, ref } from "vue";
 const loading = ref(false);
 const dialogTableVisible1 = ref(false);
+const dialogTableVisible2 = ref(false);
 const tableData = ref([]);
 const addFormRef = ref();
+const winningFormRef = ref();
 const form = ref({
   product_name:null,
   status:null,
   buy_type:null,
+});
+const winningForm = ref({
+  user_id:null,
+  item_id:null,
+});
+const keyValues = ref({
+  treasure_hunt_point_involved:'',//夺宝参与积分数量
+  treasure_hunt_amount_involved:'',//夺宝参与金额
+  treasure_hunt_invite:'',//夺宝邀请 N次
+  treasure_hunt_daily:'',//夺宝积分/金额每日可参与
+  treasure_hunt_point_partake:'',//夺宝积分参与条件
+  treasure_hunt_amount_daily:'',
+  treasure_hunt_point_daily:'',
 });
 const addForm = ref({
   buy_type: "", 
@@ -173,6 +300,11 @@ const addFormrules = ref({
     { required: true, message: "总需人次不能为空", trigger: "change" },
   ],
 });
+const winningFormrules = ref({
+  user_id: [
+    { required: true, message: "请选择用户", trigger: "change" },
+  ],
+});
 const buyTypeOptions = [
   { label: "金额", value: "Amount" },
   { label: "积分", value: "Point" },
@@ -187,6 +319,7 @@ const pagination = ref({
   pageSize: 10, // 每页显示的数量
   total: 0, // 总记录数
 });
+const userInfo = ref({})
 const modifyState = (id:any) => {
   updateItemStatusProcessing({id:id}).then((res) => {
     if (res.data.code === 0) {
@@ -197,6 +330,64 @@ const modifyState = (id:any) => {
     }
   });
 };
+const getKeyValuesInfo = () =>{
+  getKeyValues().then(res=>{
+    if(res.data.code == 0){
+      keyValues.value = res.data.data;
+    }
+  })
+}
+const keepKeyValues = (key:any) =>{
+  let data = {
+    key:key,
+    value:keyValues.value[key]
+  }
+  console.log(data,'data');
+  keyValuesUpdate(data).then(res=>{
+    if(res.data.code == 0){
+      ElMessage.success("修改成功");
+      getKeyValuesInfo()
+    }
+  })
+}
+const userOptions = ref([]);
+const getUserInfo = (id:any) =>{
+  const selectedUser = userOptions.value.find(item => item.id === id);
+  // console.log(item);
+  if(selectedUser){
+    userInfo.value.phone = selectedUser.phone || '-';
+    userInfo.value.email = selectedUser.email || '-';
+  }
+}
+const modifyWinningState = (id:any) => {
+  let data = {
+    full_name: "",
+    name: "",
+    page: 0
+  }
+  userList(data).then(res=>{
+    if(res.data.code == 0){
+      winningForm.value.item_id = id;
+      userOptions.value = res.data.data.user_list
+      dialogTableVisible2.value = true;
+    }
+  })
+};
+const confirmWinning = () =>{
+  winningFormRef.value.validate(async (valid: boolean) => {
+    if (valid) {
+      setWinner({ ...winningForm.value }).then((res) => {
+        if (res.data.code === 0) {
+          ElMessage.success("设置成功");
+          dialogTableVisible2.value = false;
+          getInfo();
+        } else {
+          ElMessage.error(res.data.data.message_zh);
+        }
+      });
+    }
+  })
+}
 const confirmAdd = () => {
   addFormRef.value.validate(async (valid: boolean) => {
     if (valid) {
@@ -257,6 +448,7 @@ const handlePageChange = (newPage: number) => {
 };
 onMounted(() => {
   getInfo();
+  getKeyValuesInfo();
 });
 </script>
 

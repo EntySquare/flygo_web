@@ -126,3 +126,36 @@ export const setTodayDeal = (data: any) => {
         data: data
     })
 }
+
+// 查询用户资产
+export const selectUserAsset = (data: any) => {
+    return request({
+        url: '/selectUserAsset',
+        method: 'post',
+        data: data
+    })
+}
+// 查询用户资产明细
+export const selectUserAssetRecord = (data: any) => {
+    return request({
+        url: '/selectUserAssetRecord',
+        method: 'post',
+        data: data
+    })
+}
+// 获取提现申请列表
+export const withdrawList = (data: any) => {
+    return request({
+        url: '/withdraw/list',
+        method: 'post',
+        data: data
+    })
+}
+// 处理提现申请
+export const withdrawHandle = (data: any) => {
+    return request({
+        url: '/withdraw/handle',
+        method: 'post',
+        data: data
+    })
+}

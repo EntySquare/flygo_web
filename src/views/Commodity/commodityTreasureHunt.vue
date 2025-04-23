@@ -141,6 +141,9 @@
               <el-button size="small" plain @click="updateInfoclick(row)"
                 >修改</el-button
               >
+              <el-button size="small" plain @click="add(row)"
+                >新增</el-button
+              >
               <el-button size="small" plain @click="AddSpecificationsClick(row)"
                 >添加规格</el-button
               >
@@ -282,11 +285,57 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+    <el-dialog
+      v-model="dialogTableVisible3"
+      title="新增"
+      style="max-width: 600px"
+    >
+      <el-form
+        :model="addForm"
+        ref="addFormRef"
+        label-width="auto"
+        :rules="addFormrules"
+      >
+        <el-form-item label="购买类型" prop="buy_type">
+          <div class="Landscape">
+              <el-select
+                v-model="addForm.buy_type"
+                placeholder="Select"
+                style="width: 176px"
+              >
+                <el-option
+                  v-for="item in buyTypeOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </div>
+        </el-form-item>
+        <!-- <el-form-item label="商品id" prop="product_id">
+          <el-input clearable v-model.trim.number="addForm.product_id" />
+        </el-form-item> -->
+        <el-form-item label="总需人次" prop="total_slots">
+          <el-input clearable v-model.trim.number="addForm.total_slots" />
+        </el-form-item>
+        <el-form-item class="footer">
+          <el-button
+            plain
+            style="width: 48%"
+            @click="dialogTableVisible3 = false"
+            >取消</el-button
+          >
+          <el-button plain style="width: 48%" @click="confirmAdd()"
+            >确认</el-button
+          >
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { addSpec,selectProduct,deleteProduct,updateProduct } from "@/api/treasureHunt";
+import { addSpec,selectProduct,deleteProduct,updateProduct,addItem } from "@/api/treasureHunt";
 import { setImageUrls, uploadImages } from "@/api/img";
 import { ElMessage } from "element-plus";
 import { onMounted, ref } from "vue";
@@ -400,6 +449,7 @@ const deleteInfo = async (id: number) => {
 };
 
 const dialogTableVisible1 = ref(false);
+const dialogTableVisible3 = ref(false);
 const UpdateForm = ref({
   category_id: "",
   description: "",
@@ -430,6 +480,7 @@ const updateInfoclick = (row: any) => {
   dialogTableVisible1.value = true;
 };
 const UpdateFormRef = ref();
+const addFormRef = ref();
 const UpdateFormrules = ref({
   description: [
     { required: true, message: "商品描述不能为空", trigger: "change" },
@@ -475,7 +526,51 @@ const UpdateInfo = async () => {
     }
   });
 };
-
+const addForm = ref({
+  buy_type: "", 
+  product_id: "", 
+  total_slots: "", 
+});
+const buyTypeOptions = [
+  { label: "金额", value: "Amount" },
+  { label: "积分", value: "Point" },
+];
+const addFormrules = ref({
+  buy_type: [
+    { required: true, message: "参与数量不能为空", trigger: "change" },
+  ],
+  total_slots: [
+    { required: true, message: "总需人次不能为空", trigger: "change" },
+  ],
+});
+const confirmAdd = () => {
+  addFormRef.value.validate(async (valid: boolean) => {
+    if (valid) {
+      addItem({ ...addForm.value }).then((res) => {
+        if (res.data.code === 0) {
+          ElMessage.success("添加成功");
+          addForm.value = {
+            buy_type: "",
+            product_id: "",
+            total_slots: "",
+          };
+          addFormRef.value.resetFields();
+          dialogTableVisible3.value = false;
+          getInfo();
+        } else {
+          ElMessage.error(res.data.data.message_zh);
+        }
+      });
+    }
+  })
+ 
+};
+const add = (row) =>{
+  if(row){
+    addForm.value.product_id = row.id;
+    dialogTableVisible3.value = true;
+  }
+}
 const AddSpecificationsVisible = ref(false);
 const AddSpecificationsForm = ref({
   product_id: null,
