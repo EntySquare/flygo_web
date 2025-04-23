@@ -51,12 +51,20 @@
         </el-form-item>
         <el-form-item label="夺宝积分参与条件: ">
           <div class="Landscape">
-            <el-input
-              style="width: 175px"
+              <el-select
               clearable
-              v-model.trim="keyValues.treasure_hunt_point_partake"
-            />
-          </div>
+                v-model="keyValues.treasure_hunt_point_partake"
+                placeholder="Select"
+                style="width: 176px"
+              >
+                <el-option
+                  v-for="item in treasureHuntPointPartake"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </div>
           <el-button style="margin-left:15px" type="primary" @click="keepKeyValues('treasure_hunt_point_partake')">保存</el-button>
         </el-form-item>
       </el-form>
@@ -305,6 +313,12 @@ const winningFormrules = ref({
     { required: true, message: "请选择用户", trigger: "change" },
   ],
 });
+const treasureHuntPointPartake = [
+    { label: "无限制", value: '0' },
+    { label: "购买过商品的⽤户", value: '1' },
+    { label: "参与过0元购的⽤户", value: '2' },
+    { label: "没有购买过任何东⻄，但账户有余额的⽤户", value: '3' },
+]
 const buyTypeOptions = [
   { label: "金额", value: "Amount" },
   { label: "积分", value: "Point" },
@@ -334,6 +348,8 @@ const getKeyValuesInfo = () =>{
   getKeyValues().then(res=>{
     if(res.data.code == 0){
       keyValues.value = res.data.data;
+      console.log(keyValues.value,'keyValues.value');
+      
     }
   })
 }
