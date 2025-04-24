@@ -68,13 +68,15 @@ const deta = [
         lable: '购买订单',
         path: '/purchase', component: () => import('@/views/Purchase/Purchase.vue')
     },
-   
-    
+    {
+        name: 'AgentList',
+        lable: '代理商管理',
+        path: '/user-agentList', component: () => import('@/views/user/agentList.vue')
+    },
     {
         name: 'Imgmanage',
         lable: '首页管理',
         path: '/Imgmanage', component: () => import('@/views/Imgmanage/index.vue')
     },
-
 ]
 export default deta

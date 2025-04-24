@@ -159,3 +159,20 @@ export const withdrawHandle = (data: any) => {
         data: data
     })
 }
+
+// 查询代理商配置
+export const selectAgentConfig = (data: any) => {
+    return request({
+        url: '/selectAgentConfig',
+        method: 'post',
+        data: data
+    })
+}
+// 更新代理商配置
+export const updateAgentConfig = (data: any) => {
+    return request({
+        url: '/updateAgentConfig',
+        method: 'post',
+        data: data
+    })
+}
