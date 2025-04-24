@@ -144,12 +144,14 @@
               <el-button
                 size="small"
                 plain
+                v-if="row.handle_status = 0"
                 @click="modifyWinner(row.status,row.id)"
                 >处理中奖</el-button
               >
               <el-button
                 size="small"
                 plain
+                v-if="row.shipping_status != 5"
                 @click="modifyShippingStatus(row)"
                 >物流状态</el-button
               >

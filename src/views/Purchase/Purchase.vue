@@ -127,14 +127,14 @@
               >退款操作</el-button
             >
             <!-- v-if="row.status === 5" -->
-            <el-button size="small" @click="ViewOrderReviewsRow(row)"
+            <el-button size="small" v-if="row.if_comment" @click="ViewOrderReviewsRow(row)"
               >查看评价</el-button
             >
             <el-button size="small" @click="viewOrderDetails(row)"
               >订单详情</el-button
             >
             <el-button
-                v-if="row.status === 1"
+                v-if="row.status === 1&&row.shipping_status != 5"
                 size="small"
                 plain
                 @click="modifyShippingStatus(row)"
@@ -189,28 +189,22 @@
     <el-dialog
       v-model="ViewOrderReviews"
       title="查看订单评价"
-      style="max-width: 500px"
+      style="max-width: 800px"
     >
-      <el-form v-if="ViewOrderReviewsList.user_id" label-width="auto">
-        <el-form-item label="用户id : ">
-          <el-text class="mx-1">{{ ViewOrderReviewsList.user_id }}</el-text>
-        </el-form-item>
-        <el-form-item label="评价时间 : ">
-          <el-text class="mx-1">{{ ViewOrderReviewsList.commentTime }}</el-text>
-        </el-form-item>
-        <el-form-item label="商品星级评价 : ">
-          <el-text class="mx-1">{{ ViewOrderReviewsList.goods_level }}</el-text>
-        </el-form-item>
-        <el-form-item label="评语 : ">
-          <el-text class="mx-1">{{ ViewOrderReviewsList.remarks }}</el-text>
-        </el-form-item>
-
-        <el-form-item class="footer">
-          <el-button plain style="width: 100%" @click="ViewOrderReviews = false"
-            >确认</el-button
-          >
-        </el-form-item>
-      </el-form>
+    <el-table v-if="ViewOrderReviewsList.length>0" :data="ViewOrderReviewsList" style="width: 100%" v-loading="loading">
+      <el-table-column prop="order_no" label="订单编号" />
+      <el-table-column prop="remarks" label="评论" show-overflow-tooltip  />
+      <el-table-column prop="goods_level" label="商品星级" />
+      <el-table-column prop="shipping_level" label="物流星级" />
+      <el-table-column prop="shipping_level" label="评论图片">
+        <template #default="{ row }">
+          <div class="table-img" v-if="row.goodsImage&&row.goodsImage.length>0">
+            <img v-for="(item,index) in row.goodsImage" :key="index" :src="item" alt="" />
+          </div>
+          <el-text v-else>暂无图片</el-text>
+        </template>
+      </el-table-column>
+    </el-table>
       <div v-else style="text-align: center">
         <el-text style="text-align: center" size="large" class="mx-1"
           >暂无订单评价</el-text
@@ -525,23 +519,17 @@ const handleStatusChange = async (row: any, status: any) => {
     ElMessage.error("状态变化处理失败");
   }
 };
-const ViewOrderReviewsList = ref({
-  user_id: "",
-  commentTime: "",
-  goods_level: "",
-  remarks: "",
-});
+const ViewOrderReviewsList = ref([]);
 const ViewOrderReviewsRow = async (row: any) => {
   console.log("ViewOrderReviewsRow", row);
   try {
     loading.value = true;
-    const res = await displayOrderComment({ order_id: row.order_id });
+    const res = await displayOrderComment({ id: row.id });
     if (res.data.code === 0) {
       if (res.data.data) {
-        ViewOrderReviewsList.value.user_id = res.data.data.user_id;
-        ViewOrderReviewsList.value.commentTime = res.data.data.commentTime;
-        ViewOrderReviewsList.value.goods_level = res.data.data.goods_level;
-        ViewOrderReviewsList.value.remarks = res.data.data.remarks;
+        ViewOrderReviewsList.value = res.data.data;
+      }else{
+        ViewOrderReviewsList.value = []
       }
       console.log("ViewOrderReviewsList", ViewOrderReviewsList.value);
 
@@ -604,6 +592,18 @@ onMounted(() => {
 });
 </script>
 <style scoped lang="less">
+:deep(.el-popper){
+  width: 450px !important;
+}
+.table-img{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  img{
+    width: 50px;
+    height: auto;
+  }
+}
 .dialog-title{
   margin-bottom: 20px;
 }
