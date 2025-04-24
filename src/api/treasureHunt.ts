@@ -192,3 +192,12 @@ export const keyValuesUpdate = (data: any) => {
         data,
     })
 }
+
+// 查询夺宝订单详情
+export const orderDetail = (data: any) => {
+    return request({
+        url: '/treasureHuntOrder/detail',
+        method: 'post',
+        data,
+    })
+}

@@ -153,6 +153,9 @@
                 @click="modifyShippingStatus(row)"
                 >物流状态</el-button
               >
+              <el-button v-if="row.status == 'Pickup'" size="small" @click="viewOrderDetails(row)"
+                >订单详情</el-button
+              >
             </div>
           </template>
         </el-table-column>
@@ -237,6 +240,48 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+    <el-dialog
+      v-model="viewOrderDetailsDialog"
+      title="查看订单详情"
+      style="max-width: 900px"
+    >
+    <h3 class="dialog-title">收货地址信息：</h3>
+    <el-form label-width="auto" :inline="true">
+        <el-form-item label="国家: ">
+          <el-input v-model="address_info.Country" disabled />
+        </el-form-item>
+        <el-form-item label="省份: ">
+          <el-input v-model="address_info.Province" disabled />
+        </el-form-item>
+        <el-form-item label="城市: ">
+          <el-input v-model="address_info.City" disabled />
+        </el-form-item>
+        <el-form-item label="详细地址: ">
+          <el-input type="textarea" v-model="address_info.Address" disabled />
+        </el-form-item>
+        <el-form-item label="手机号: ">
+          <el-input v-model="address_info.Phone" disabled />
+        </el-form-item>
+        <el-form-item label="邮编: ">
+          <el-input v-model="address_info.PostalCode" disabled />
+        </el-form-item>
+    </el-form>
+    <h3 class="dialog-title">商品列表：</h3>
+    <el-table :data="tableData2" style="width: 100%">
+      <el-table-column prop="price" label="基础价格" />
+      <el-table-column prop="product_name" label="商品名字" />
+      <el-table-column prop="product_name_en" label="商品名字英文" />
+      <el-table-column prop="quantity" label="数量" />
+      <el-table-column prop="spec_images" label="规格图片">
+        <template #default="{ row }">
+            <img v-if="row.spec_images" :src="row.spec_images ? JSON.parse(row.spec_images) : ''" alt="" />
+            <el-text v-else>暂无图片</el-text>
+          </template>
+      </el-table-column>
+      <el-table-column prop="spec_name" label="规格名" />
+      <el-table-column prop="spec_name_en" label="规格名英文" />
+    </el-table>
+    </el-dialog>
   </div>
 </template>
 
@@ -245,6 +290,7 @@ import {
   adminQueryPurchaseOrder,
   updateShippingStatus,
   handleWinner,
+  orderDetail
 } from "@/api/treasureHunt";
 import { setImageUrls, uploadImages } from "@/api/img";
 import { ElMessage } from "element-plus";
@@ -252,7 +298,10 @@ import { onMounted, ref } from "vue";
 const loading = ref(false);
 const dialogTableVisible1 = ref(false);
 const dialogTableVisible2 = ref(false);
+const viewOrderDetailsDialog = ref(false);
 const tableData = ref([]);
+const tableData2 = ref([]);
+const address_info = ref({});
 const winningFormRef = ref();
 const shippingFormRef = ref();
 const form = ref({
@@ -349,6 +398,27 @@ const confirmShipping = () =>{
     })
    
 }
+const viewOrderDetails = async (row: any) => {
+  try {
+    // loading.value = true;
+    const res = await orderDetail({ order_no: row.order_no });
+    if (res.data.code === 0) {
+      viewOrderDetailsDialog.value = true;
+      if(res.data.data.products.length > 0){
+        tableData2.value = res.data.data.products;
+      }else{
+        tableData2.value = []
+      }
+      address_info.value = res.data.data.address_info;
+    } else {
+      ElMessage.error("获取订单评价失败");
+    }
+  } catch {
+    ElMessage.error("获取订单评价失败");
+  } finally {
+    // loading.value = false;
+  }
+};
 const confirm = () => {
 winningFormRef.value.validate(async (valid: boolean) => {
     if (valid) {
@@ -367,7 +437,7 @@ winningFormRef.value.validate(async (valid: boolean) => {
 const modifyShippingStatus = (row:any) => {
   dialogTableVisible2.value = true;
   shippingForm.value = {
-    order_no:'',
+    tracking_number:'',
     shipping_status:row.shipping_status,
     order_no:row.order_no,
   }
@@ -417,6 +487,9 @@ onMounted(() => {
 </script>
 
 <style scoped lang="less">
+.dialog-title{
+  margin-bottom: 20px;
+}
 .Landscape {
   display: flex;
 }

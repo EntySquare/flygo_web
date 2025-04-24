@@ -44,3 +44,11 @@ export const updateShippingStatus = (data: any) => {
         data,
     })
 }
+// 查询订单详情
+export const orderDetail = (data: any) => {
+    return request({
+        url: '/order/detail',
+        method: 'post',
+        data,
+    })
+}

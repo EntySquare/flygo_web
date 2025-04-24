@@ -37,6 +37,7 @@
           </el-form-item>
           <el-form-item label="物流状态 : " style="width: 240px">
             <el-select
+            clearable
               v-model="form.shipping_status"
               placeholder="Select"
               style="width: 100%"
@@ -51,6 +52,7 @@
           </el-form-item>
           <el-form-item label="订单状态 : " style="width: 240px">
             <el-select
+            clearable
               v-model="form.status"
               placeholder="Select"
               style="width: 100%"
@@ -75,14 +77,6 @@
       <el-table :data="tableData" style="width: 100%" v-loading="loading">
         <el-table-column prop="order_no" label="订单编号" />
         <el-table-column prop="discount" label="折扣金额" />
-        <el-table-column prop="goodsImage" label="商品图片"
-          ><template #default="{ row }">
-            <img v-if="row.goodsImage" :src="row.goodsImage" alt="" />
-            <el-text v-else>暂无图片</el-text>
-          </template>
-        </el-table-column>
-        <el-table-column prop="goodsName" label="商品名称" />
-
         <el-table-column prop="order_id" label="订单编号" />
         <el-table-column prop="paid_at" label="支付时间" />
         <el-table-column prop="pay_amount" label="实际支付金额" />
@@ -107,11 +101,7 @@
         </el-table-column>
         <el-table-column prop="shipping_status" label="物流状态">
           <template #default="{ row }">
-            <el-dropdown
-              trigger="click"
-              @command="handleStatusChange(row, $event)"
-            >
-              <el-button size="small">
+            <span>
                 {{
                   row.shipping_status === 0
                     ? "未发货"
@@ -125,17 +115,7 @@
                     ? "已签收"
                     : "确认收货"
                 }}
-              </el-button>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item :command="1">预备发货</el-dropdown-item>
-                  <el-dropdown-item :command="2">已发货</el-dropdown-item>
-                  <el-dropdown-item :command="3">派送中</el-dropdown-item>
-                  <el-dropdown-item :command="4">已签收</el-dropdown-item>
-                  <el-dropdown-item :command="5">确认收货</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
+              </span>
           </template>
         </el-table-column>
         <el-table-column label="操作">
@@ -150,6 +130,16 @@
             <el-button size="small" @click="ViewOrderReviewsRow(row)"
               >查看评价</el-button
             >
+            <el-button size="small" @click="viewOrderDetails(row)"
+              >订单详情</el-button
+            >
+            <el-button
+                v-if="row.status === 1"
+                size="small"
+                plain
+                @click="modifyShippingStatus(row)"
+                >物流状态</el-button
+              >
           </template>
         </el-table-column>
       </el-table>
@@ -227,6 +217,89 @@
         >
       </div>
     </el-dialog>
+    <el-dialog
+      v-model="viewOrderDetailsDialog"
+      title="查看订单详情"
+      style="max-width: 900px"
+    >
+    <h3 class="dialog-title">收货地址信息：</h3>
+    <el-form label-width="auto" :inline="true">
+        <el-form-item label="国家: ">
+          <el-input v-model="address_info.Country" disabled />
+        </el-form-item>
+        <el-form-item label="省份: ">
+          <el-input v-model="address_info.Province" disabled />
+        </el-form-item>
+        <el-form-item label="城市: ">
+          <el-input v-model="address_info.City" disabled />
+        </el-form-item>
+        <el-form-item label="详细地址: ">
+          <el-input type="textarea" v-model="address_info.Address" disabled />
+        </el-form-item>
+        <el-form-item label="手机号: ">
+          <el-input v-model="address_info.Phone" disabled />
+        </el-form-item>
+        <el-form-item label="邮编: ">
+          <el-input v-model="address_info.PostalCode" disabled />
+        </el-form-item>
+    </el-form>
+    <h3 class="dialog-title">商品列表：</h3>
+    <el-table :data="tableData2" style="width: 100%">
+      <el-table-column prop="price" label="基础价格" />
+      <el-table-column prop="product_name" label="商品名字" />
+      <el-table-column prop="product_name_en" label="商品名字英文" />
+      <el-table-column prop="quantity" label="数量" />
+      <el-table-column prop="spec_images" label="规格图片">
+        <template #default="{ row }">
+            <img v-if="row.spec_images" :src="row.spec_images ? JSON.parse(row.spec_images) : ''" alt="" />
+            <el-text v-else>暂无图片</el-text>
+          </template>
+      </el-table-column>
+      <el-table-column prop="spec_name" label="规格名" />
+      <el-table-column prop="spec_name_en" label="规格名英文" />
+    </el-table>
+    </el-dialog>
+    <el-dialog
+      v-model="dialogTableVisible2"
+      title="处理物流状态"
+      style="max-width: 600px"
+    >
+      <el-form
+        :model="shippingForm"
+        ref="shippingFormRef"
+        label-width="auto"
+        :rules="shippingFormrules"
+      >
+        <el-form-item label="物流单号" prop="tracking_number">
+          <el-input clearable v-model.trim="shippingForm.tracking_number" />
+        </el-form-item>
+        <el-form-item label="物流状态" prop="shipping_status">
+            <el-select
+                v-model="shippingForm.shipping_status"
+                placeholder="Select"
+                style="width: 176px"
+              >
+                <el-option
+                  v-for="item in shippingStatusVlaue"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+        </el-form-item>
+        <el-form-item class="footer">
+          <el-button
+            plain
+            style="width: 48%"
+            @click="dialogTableVisible2 = false"
+            >取消</el-button
+          >
+          <el-button plain style="width: 48%" @click="confirmShipping()"
+            >确认</el-button
+          >
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
         
@@ -237,6 +310,7 @@ import {
   proveRefundOrder,
   refuseRefundOrder,
   updateShippingStatus,
+  orderDetail
 } from "@/api/order";
 
 import { ElMessage } from "element-plus";
@@ -244,20 +318,32 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useWindowSize } from "@/utils/useWindowSize";
 const { width } = useWindowSize();
 const loading = ref(false);
+const dialogTableVisible2 = ref(false);
 // const storedToken = localStorage.getItem("token");
 // if (!storedToken) {
 //   ElMessage.error("請先登入");
 //   router.push('/login')
 // }
+const shippingFormRef = ref();
+const shippingForm = ref({
+    tracking_number:'',
+    shipping_status:0
+});
+const shippingFormrules = ref({
+    tracking_number	: [
+    { required: true, message: "物流单号不能为空", trigger: "change" },
+  ],
+});
 const form = ref({
   order_id: "",
   shipping_condition: "",
   page: 0,
   shipping_status: "", // 物流状态 0:未发货 1:预备发货 2:已发货 3:派送中 4:已签收 5:确认收货
-  status: "", // 订单状态 0:待付款 1:已付款 -1:付款失败/取消付款 2:退款中 3:退款成功 4:退款失败/取消
+  status: "1", // 订单状态 0:待付款 1:已付款 -1:付款失败/取消付款 2:退款中 3:退款成功 4:退款失败/取消
   time_duration: [] as number[],
   user_id: "",
 });
+const address_info = ref({})
 const statusVlaue = ref([
   { label: "待付款", value: "0" },
   { label: "已付款", value: "1" },
@@ -269,27 +355,27 @@ const statusVlaue = ref([
 const shippingStatusVlaue = ref([
   {
     label: "未发货",
-    value: "0",
+    value: 0,
   },
   {
     label: "预备发货",
-    value: "1",
+    value: 1,
   },
   {
     label: "已发货",
-    value: "2",
+    value: 2,
   },
   {
     label: "派送中",
-    value: "3",
+    value: 3,
   },
   {
     label: "已签收",
-    value: "4",
+    value: 4,
   },
   {
     label: "确认收货",
-    value: "5",
+    value: 5,
   },
 ]);
 const RefundOperationVlaue = ref([
@@ -303,6 +389,7 @@ const RefundOperationVlaue = ref([
   },
 ]);
 const tableData = ref([]);
+const tableData2 = ref([]);
 const pagination = ref({
   page: 1, // 当前页
   pageSize: 10, // 每页条数
@@ -361,14 +448,14 @@ const ResetgetInfo = () => {
     shipping_condition: "",
     page: 0,
     shipping_status: "",
-    status: "",
+    status: "1",
     time_duration: [],
     user_id: "",
   };
   dateRange.value = null;
   pagination.value.page = 1;
   tableData.value = [];
-  // getInfo();
+  getInfo();
 };
 
 const handlePageChange = (newPage: number) => {
@@ -420,6 +507,7 @@ const RefundOperationInfo = async () => {
 };
 
 const ViewOrderReviews = ref(false);
+const viewOrderDetailsDialog = ref(false);
 
 // 状态变化处理
 const handleStatusChange = async (row: any, status: any) => {
@@ -467,11 +555,58 @@ const ViewOrderReviewsRow = async (row: any) => {
     loading.value = false;
   }
 };
+const viewOrderDetails = async (row: any) => {
+  try {
+    // loading.value = true;
+    const res = await orderDetail({ order_no: row.order_no });
+    if (res.data.code === 0) {
+      viewOrderDetailsDialog.value = true;
+      if(res.data.data.products.length > 0){
+        tableData2.value = res.data.data.products;
+      }else{
+        tableData2.value = []
+      }
+      address_info.value = res.data.data.address_info;
+    } else {
+      ElMessage.error("获取订单评价失败");
+    }
+  } catch {
+    ElMessage.error("获取订单评价失败");
+  } finally {
+    // loading.value = false;
+  }
+};
+const modifyShippingStatus = (row:any) => {
+  dialogTableVisible2.value = true;
+  shippingForm.value = {
+    tracking_number:'',
+    shipping_status:row.shipping_status,
+    order_no:row.order_no,
+  }
+};
+const confirmShipping = () =>{
+    shippingFormRef.value.validate(async (valid: boolean) => {
+        if (valid) {
+            const res = await updateShippingStatus(shippingForm.value);
+            if (res.data.code === 0) {
+                ElMessage.success("状态变化处理成功");
+                dialogTableVisible2.value = false;
+                await getInfo();
+            } else {
+                ElMessage.error("状态变化处理失败");
+            }
+        }
+    })
+   
+}
 onMounted(() => {
   getInfo();
 });
 </script>
 <style scoped lang="less">
+.dialog-title{
+  margin-bottom: 20px;
+}
 .Landscape {
   display: flex;
 }
