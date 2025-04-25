@@ -49,9 +49,9 @@ const deta = [
         lable: '用户资产',
         path: '/user-assetList', component: () => import('@/views/user/assetList.vue')
     },{
-        name: 'winningList',
+        name: 'withdrawApplyList',
         lable: '提现申请列表',
-        path: '/user-withdrawList', component: () => import('@/views/user/winningList.vue')
+        path: '/withdrawApplyList', component: () => import('@/views/user/withdrawList.vue')
     },
     {
         name: 'treasureHunt',
