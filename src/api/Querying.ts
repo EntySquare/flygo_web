@@ -176,3 +176,10 @@ export const updateAgentConfig = (data: any) => {
         data: data
     })
 }
+// 查询代理商商品ID列表
+export const selectAgentSpecIds = () => {
+    return request({
+        url: '/selectAgentSpecIds',
+        method: 'post',
+    })
+}

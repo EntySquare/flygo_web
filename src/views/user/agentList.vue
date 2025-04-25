@@ -5,10 +5,10 @@
     </div>
     <div class="cont">
       <el-table :data="tableData" style="width: 100%" v-loading="loading">
-        <el-table-column prop="amount" label="数量" />
-        <el-table-column prop="rate" label="比例" />
         <el-table-column prop="id" label="主键ID" />
         <el-table-column prop="level" label="级别" />
+        <el-table-column prop="amount" label="数量" />
+        <el-table-column prop="rate" label="比例" />
         <el-table-column prop="product_id" label="商品ID" />
         <el-table-column label="操作">
           <template #default="{ row }">
@@ -28,7 +28,7 @@
     >
     <el-form
         :model="form"
-        label-width="auto"
+        label-width="70px"
       >
         <el-form-item label="数量">
           <el-input clearable v-model.trim.number="form.amount" />
@@ -36,13 +36,27 @@
         <el-form-item label="比例">
           <el-input clearable v-model.trim.number="form.rate" />
         </el-form-item>
-        <el-form-item label="级别">
-          <el-input clearable v-model.trim.number="form.level" />
+        <el-form-item label="商品ID">
+          <div class="Landscape">
+              <el-select
+                v-model="form.product_id"
+                placeholder="选择商品ID"
+               style="width: 176px"
+              >
+                <el-option
+                  v-for="item in productList"
+                  :key="item.spec_id"
+                  :label="item.spec_id"
+                  :value="item.spec_id"
+                />
+              </el-select>
+          </div>
+          <!-- <el-input clearable v-model.trim.number="form.product_id" /> -->
         </el-form-item>
         <el-form-item class="footer">
           <el-button
             plain
-            style="width: 48%"
+            style="width: 45%"
             @click="dialogTableVisible1 = false"
             >取消</el-button
           >
@@ -56,7 +70,7 @@
 </template>
 
 <script lang="ts" setup>
-import { selectAgentConfig, updateAgentConfig } from "@/api/Querying";
+import { selectAgentConfig, updateAgentConfig,selectAgentSpecIds } from "@/api/Querying";
 import { ElMessage } from "element-plus";
 import { onMounted, ref } from "vue";
 
@@ -69,6 +83,7 @@ const form = ref({
     product_id:null,
     rate:null,
 });
+const productList = ref([])
 const tableData = ref([]);
 const pagination = ref({
   page: 1, // 当前页
@@ -76,8 +91,15 @@ const pagination = ref({
   total: 0, // 数据总条数
 });
 const modify = (row: any) => {
-  dialogTableVisible1.value = true;
-  form.value = row
+  selectAgentSpecIds().then(res=>{
+    if(res.data.code == 0){
+      let arr = res.data.data
+      productList.value = arr.filter(item=>item.spec_id == row.product_id)
+      dialogTableVisible1.value = true;
+      form.value = row
+    }
+  })
+ 
 };
 const getInfo = async () => {
   try {
