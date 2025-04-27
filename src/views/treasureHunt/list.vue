@@ -155,6 +155,7 @@
           <template #default="{ row }">
             <div style="display: flex; flex-wrap: wrap; gap: 4px">
               <el-button v-if="row.status!='End'" size="small" plain @click="modifyWinningState(row.id)">设置中奖</el-button>
+              <el-button v-if="row.status!='End'" size="small" plain @click="modify(row)">修改</el-button>
             </div>
           </template>
         </el-table-column>
@@ -265,11 +266,60 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+    <el-dialog
+      v-model="dialogTableVisible3"
+      title="修改"
+      style="max-width: 400px"
+    >
+    <el-form
+        :model="modifyForm"
+        ref="modifyFormRef"
+        label-width="auto"
+        :rules="modifyFormrules"
+      >
+      <el-form-item label="状态" prop="status">
+          <div class="Landscape">
+              <el-select
+                v-model="modifyForm.status"
+                placeholder="Select"
+                style="width: 176px"
+              >
+                <el-option
+                  v-for="item in statusOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </div>
+        </el-form-item>
+        <!-- <el-form-item label="参与数量">
+          <el-input v-model.trim.number="modifyForm.join_count"/>
+        </el-form-item>
+        <el-form-item label="剩余人次">
+          <el-input v-model.trim.number="modifyForm.remaining"/>
+        </el-form-item> -->
+        <el-form-item label="总需人次" prop="total_slots">
+          <el-input v-model.trim.number="modifyForm.total_slots"/>
+        </el-form-item>
+        <el-form-item class="footer">
+          <el-button
+            plain
+            style="width: 48%"
+            @click="dialogTableVisible2 = false"
+            >取消</el-button
+          >
+          <el-button plain style="width: 48%" @click="confirmModify()"
+            >确认</el-button
+          >
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { selectItem,addItem,updateItemStatusProcessing,setWinner,getKeyValues,keyValuesUpdate } from "@/api/treasureHunt";
+import { selectItem,addItem,updateItemStatusProcessing,setWinner,getKeyValues,keyValuesUpdate,updateItem } from "@/api/treasureHunt";
 import { setImageUrls, uploadImages } from "@/api/img";
 import { userList } from "@/api/Querying";
 import { ElMessage } from "element-plus";
@@ -277,9 +327,11 @@ import { onMounted, ref } from "vue";
 const loading = ref(false);
 const dialogTableVisible1 = ref(false);
 const dialogTableVisible2 = ref(false);
+const dialogTableVisible3 = ref(false);
 const tableData = ref([]);
 const addFormRef = ref();
 const winningFormRef = ref();
+const modifyFormRef = ref();
 const form = ref({
   product_name:null,
   status:null,
@@ -288,6 +340,11 @@ const form = ref({
 const winningForm = ref({
   user_id:null,
   item_id:null,
+});
+const modifyForm = ref({
+  status:null,
+  total_slots:null,
+  item_id:null
 });
 const keyValues = ref({
   treasure_hunt_point_involved:'',//夺宝参与积分数量
@@ -309,6 +366,14 @@ const addFormrules = ref({
   ],
   product_id: [
     { required: true, message: "商品id不能为空", trigger: "change" },
+  ],
+  total_slots: [
+    { required: true, message: "总需人次不能为空", trigger: "change" },
+  ],
+});
+const modifyFormrules = ref({
+  status: [
+    { required: true, message: "请选择状态", trigger: "change" },
   ],
   total_slots: [
     { required: true, message: "总需人次不能为空", trigger: "change" },
@@ -350,6 +415,30 @@ const modifyState = (id:any) => {
     }
   });
 };
+const modify = (row:any) =>{
+  dialogTableVisible3.value = true;
+  modifyForm.value = {
+    status:row.status,
+    total_slots:row.total_slots,
+    item_id:row.id,
+  }
+}
+const confirmModify = () =>{
+  modifyFormRef.value.validate(async (valid: boolean) => {
+    if (valid) {
+      updateItem({...modifyForm.value }).then((res) => {
+        if (res.data.code === 0) {
+          ElMessage.success("修改成功");
+          dialogTableVisible3.value = false;
+          getInfo();
+        } else {
+          ElMessage.error(res.data.data.message_zh);
+        }
+      });
+    }
+  })
+ 
+}
 const getKeyValuesInfo = () =>{
   getKeyValues().then(res=>{
     if(res.data.code == 0){
@@ -395,6 +484,7 @@ const modifyWinningState = (id:any) => {
     }
   })
 };
+
 const confirmWinning = () =>{
   winningFormRef.value.validate(async (valid: boolean) => {
     if (valid) {

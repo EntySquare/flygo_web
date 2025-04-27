@@ -201,3 +201,12 @@ export const orderDetail = (data: any) => {
         data,
     })
 }
+
+// 修改夺宝列表
+export const updateItem = (data: any) => {
+    return request({
+        url: '/treasureHunt/updateItem',
+        method: 'post',
+        data,
+    })
+}
