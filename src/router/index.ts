@@ -35,6 +35,7 @@ let router = createRouter({
         { path: '/Imgmanage', component: () => import('@/views/Imgmanage/index.vue') },
         { path: '/treasureHunt', component: () => import('@/views/treasureHunt/list.vue') },
         { path: '/treasureHunt-winningList', component: () => import('@/views/treasureHunt/winningList.vue') },
+        { path: '/treasureHunt-orders', component: () => import('@/views/treasureHunt/orders.vue') },
 
       ]
     },

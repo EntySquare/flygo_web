@@ -210,3 +210,11 @@ export const updateItem = (data: any) => {
         data,
     })
 }
+// 查询夺宝订单详情
+export const adminQueryTreasureHuntOrders = (data: any) => {
+    return request({
+        url: '/treasureHuntOrder/adminQueryTreasureHuntOrders',
+        method: 'post',
+        data,
+    })
+}

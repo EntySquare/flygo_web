@@ -464,7 +464,7 @@ const getInfo = async () => {
 
     if (res.data.code === 0) {
       if (res.data.data.winner_list === null || res.data.data.winner_list.length === 0) {
-        ElMessage("暂无数据");
+        // ElMessage("暂无数据");
         return;
       }
       tableData.value = res.data.data.winner_list; //
