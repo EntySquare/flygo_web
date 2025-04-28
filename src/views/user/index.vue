@@ -31,15 +31,22 @@
         </el-form>
       </div>
       <el-table :data="tableData" style="width: 100%" v-loading="loading">
+        <el-table-column prop="id" label="用户id" />
         <el-table-column prop="name" label="个性化用户名" />
         <el-table-column prop="full_name" label="姓名" />
-        <el-table-column prop="avatar_url" label="头像地址">
+        <el-table-column prop="avatar_url" label="用户头像">
           <template #default="{ row }">
             <img
               :src="row.avatar_url"
               alt=""
               style="width: 50px; height: 50px"
             />
+          </template>
+        </el-table-column>
+        <el-table-column prop="level" label="是否为代理商">
+          <template #default="{ row }">
+            <span v-if="row.level==0">普通用户</span>
+            <span v-else-if="row.level>=1">{{row.level}}级代理</span>
           </template>
         </el-table-column>
         <el-table-column prop="created_time" label="创建时间" />
