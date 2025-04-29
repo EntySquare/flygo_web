@@ -65,6 +65,21 @@
               />
             </el-select>
           </el-form-item>
+          <el-form-item label="代理商订单 : " style="width: 240px">
+            <el-select
+            clearable
+              v-model="form.is_agent_order"
+              placeholder="Select"
+              style="width: 100%"
+            >
+              <el-option
+                v-for="item in agentVlaue"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
 
           <el-form-item>
             <el-button size="small" plain @click="getInfo()">查詢</el-button>
@@ -336,6 +351,7 @@ const form = ref({
   status: "1", // 订单状态 0:待付款 1:已付款 -1:付款失败/取消付款 2:退款中 3:退款成功 4:退款失败/取消
   time_duration: [] as number[],
   user_id: "",
+  is_agent_order: null,
 });
 const address_info = ref({})
 const statusVlaue = ref([
@@ -346,6 +362,7 @@ const statusVlaue = ref([
   { label: "退款成功", value: "3" },
   { label: "退款失败/取消", value: "4" },
 ]);
+const agentVlaue = [{ label: "否", value: 2 }, { label: "是", value: 1 }]
 const shippingStatusVlaue = ref([
   {
     label: "未发货",
@@ -421,7 +438,7 @@ const getInfo = async () => {
       console.log("res.data.data", res.data.data);
 
       if (res.data.data.length === 0) {
-        ElMessage("暂无数据");
+        // ElMessage("暂无数据");
       }
       // pagination.value.total = res.data.data.page_size;
     } else {
@@ -445,6 +462,7 @@ const ResetgetInfo = () => {
     status: "1",
     time_duration: [],
     user_id: "",
+    is_agent_order: null,
   };
   dateRange.value = null;
   pagination.value.page = 1;
